@@ -1,2 +1,2 @@
-# studio-yng
-Studio YNG: apresentações YoungNetwork Group
+# Studio YNG
+Apresentações YoungNetwork publicadas pelo Studio YNG.
