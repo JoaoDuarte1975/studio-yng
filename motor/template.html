@@ -284,7 +284,8 @@ body.onepage .opbtn.back{background:#fff;border:1px solid #d4d6dc}
   .opbtn{padding:8px 11px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.rv{opacity:1;transform:none}}
-__TEMA__</style>
+__TEMA__#draftTag{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:45;background:#E74F3D;color:#fff;font:700 12px/1 var(--mono);letter-spacing:.14em;padding:8px 14px;border-radius:99px;pointer-events:none;white-space:nowrap}
+</style>
 </head>
 <body>
 <div id="gate" hidden>
@@ -476,6 +477,7 @@ const closeModal=()=>{$("#mBody").innerHTML="";$("#modal").classList.remove("on"
 
 function start(data){
   D=data; MODE=["pagina","onepage"].includes(D.meta.mode)?D.meta.mode:"reel";
+  if(D.meta.draft){ const t=document.createElement("div"); t.id="draftTag"; t.textContent="DRAFT · USO INTERNO"; document.body.append(t); }
   $("#bPdf").onclick=()=>print();
   $("#gate").hidden=true; $("#app").hidden=false;
   langButtons($("#hLangs")); render(); setLang(lang);

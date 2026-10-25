@@ -114,10 +114,11 @@ BLOCOS = {
 }
 TIPO_PARA_BLOCO = {b["tipo"]: n for n, b in BLOCOS.items()}
 
-ESTADOS = ["Draft", "Publicar", "A publicar", "Publicado", "Erro"]
+ESTADOS = ["Ficha", "Draft", "Publicado", "Erro"]
 IDIOMAS = ["PT+EN", "PT", "PT+EN+ES", "EN"]
 FORMATOS = ["Página", "Reel"]
 SELETOR_CORES = "https://htmlcolorcodes.com/color-picker/"
+PAINEL = "https://claude.ai/artifact/NaeQyJRWdwQfmKCdEj2Qhc"
 
 CONFIG = [
     ("Título PT", "Título da apresentação (aparece na entrada e no separador do browser).", ""),
@@ -140,12 +141,15 @@ CONFIG = [
     ("Logo da marca", "Só para usar outro logótipo (ficheiro na pasta Media). Em branco = logótipo da marca.", ""),
     ("Logo cliente", "Logótipo do cliente (ficheiro na pasta Media ou link). Opcional.", ""),
     ("Pedido por", "Email de quem pede. Recebe o link e a senha quando estiver publicada.", ""),
-    ("Estado", "Preenchido automaticamente. Começa em 'Draft'. Para publicar, use o botão 'Publicar' no Studio YNG.", "Draft"),
-    ("Link publicado", "Preenchido automaticamente.", ""),
+    ("Estado", "Preenchido automaticamente: Ficha (por preencher), Draft (pré-visualização gerada), Publicado, Erro. Os botões estão no Studio YNG.", "Ficha"),
+    ("Senha draft", "Senha interna da pré-visualização. Preenchida automaticamente; nunca a dê ao cliente.", ""),
+    ("Link draft", "Pré-visualização interna. Preenchido automaticamente.", ""),
+    ("Draft gerado em", "Preenchido automaticamente.", ""),
+    ("Link publicado", "Link final do cliente. Preenchido automaticamente.", ""),
     ("Publicado em", "Data e hora da última publicação. Preenchido automaticamente.", ""),
     ("Mensagem do sistema", "Preenchido automaticamente (erros e avisos).", ""),
 ]
-AUTO = {"Título EN", "Barra EN", "Link publicado", "Publicado em", "Mensagem do sistema"}
+AUTO = {"Título EN", "Barra EN", "Senha draft", "Link draft", "Draft gerado em", "Link publicado", "Publicado em", "Mensagem do sistema", "Estado"}
 ESQUELETO = [("Capa", ""), ("Texto e imagem", "Quem somos"), ("Números", "Resultados"),
              ("Vídeos e trabalhos", "Trabalhos"), ("Equipa", "Equipa"), ("Contactos", "Contactos")]
 
@@ -166,7 +170,7 @@ CAMPOS_CAB = [("Ideias", "ideias", False, "Escreva aqui as ideias soltas, em bru
               (P, "pedido", False, "Opcional: como quer o bloco (ex.: 'vídeo à esquerda, números à direita'). No Bloco livre é obrigatório.")]
 FOLHA = "Conteúdo"
 
-def _r0(n): return 1 + (n - 1) * ALTURA      # linha do título "SECÇÃO n"
+def _r0(n): return 4 + (n - 1) * ALTURA      # linha do título "SECÇÃO n" (linhas 1-2: aviso)
 
 
 # ------------------------------------------------------------------ modelo
@@ -267,7 +271,8 @@ def criar_modelo(saida, exemplo=None):
         ("STUDIO YNG · COMO FAZER UMA APRESENTAÇÃO", "t"),
         ("", ""),
         ("1. DE ONDE VEM ESTE EXCEL", "s"),
-        ("   Foi criado pelo Studio YNG quando alguém carregou em 'Nova apresentação'. Está em Studio YNG > Apresentações > <nome>.", ""),
+        ("   Foi criado pelo Studio YNG (" + PAINEL + ") quando alguém carregou em 'Nova apresentação'.", ""),
+        ("   Está em Studio YNG > Apresentações > <nome>.", ""),
         ("   Na mesma pasta há a pasta Media, para vídeos e imagens. Não mude nomes nem mova o Excel.", ""),
         ("", ""),
         ("2. VÍDEOS, IMAGENS E LOGÓTIPOS", "s"),
@@ -298,9 +303,12 @@ def criar_modelo(saida, exemplo=None):
         ("6. IDIOMAS", "s"),
         ("   Escreva só em português. As colunas de inglês (lilás) são preenchidas automaticamente; se escrever lá, prevalece a sua versão.", ""),
         ("", ""),
-        ("7. PUBLICAR", "s"),
-        ("   Guarde o Excel e carregue em 'Publicar' no Studio YNG. Arranca logo; recebe por email o link e a senha.", ""),
-        ("   Para alterar depois: edite e carregue outra vez em 'Publicar'. O link mantém-se.", ""),
+        ("7. DRAFT E PUBLICAR", "s"),
+        ("   a. Guarde o Excel e carregue em 'Gerar draft' no Studio YNG. Recebe por email o link da pré-visualização e a senha interna.", ""),
+        ("   b. Veja o draft. Para corrigir: mude o Excel, guarde e carregue outra vez em 'Gerar draft'.", ""),
+        ("   c. Quando o draft estiver aprovado, carregue em 'Publicar'. Sai o link final do cliente, com a senha do cliente.", ""),
+        ("   d. Se mexer no Excel ou na Media depois do draft, o Publicar pede um draft novo, para nunca sair nada que não foi visto.", ""),
+        ("   e. Para alterar depois de publicada: corrigir, novo draft, publicar. O link do cliente mantém-se.", ""),
         ("   Se houver erros, o Studio YNG mostra-os e recebe um email com o que corrigir.", ""),
         ("", ""),
         ("LIMITES", "s"),
@@ -342,6 +350,11 @@ def criar_modelo(saida, exemplo=None):
     wbk.sheet_state = "hidden"
 
     wt = wb.create_sheet(FOLHA)
+    wt.sheet_properties.tabColor = "E74F3D"
+    b1 = wt.cell(1, 1, "QUANDO ACABAR: guarde o Excel e carregue em 'Gerar draft' no Studio YNG. Veja o draft e só depois carregue em 'Publicar'.")
+    b1.font = Font(bold=True, size=12, color="FFFFFF"); b1.fill = PatternFill("solid", fgColor=SECC)
+    wt.merge_cells(start_row=1, start_column=1, end_row=1, end_column=15)
+    b2 = wt.cell(2, 1, "Abrir o Studio YNG: " + PAINEL); b2.hyperlink = PAINEL; b2.font = Font(underline="single", color="0044FF")
     larg = [18, 34, 30, 26, 24, 24, 22, 22, 22, 22, 22, 22, 22, 22, 22]
     for j, w in enumerate(larg, 1): wt.column_dimensions[get_column_letter(j)].width = w
     secs = exemplo.get("seccoes") or [{"Bloco": b, "Nome no menu": m} for b, m in ESQUELETO]
@@ -601,19 +614,39 @@ def _media_html(html, M, logo, logo2):
     html = html.replace("media:@logo2", logo2 or "").replace("media:@logo", logo or "")
     return re.sub(r'media:([^"\']+)', lambda m: M(m.group(1)) or m.group(0), html)
 
-def garantir_senha(xlsx):
-    cfg, _ = ler(xlsx)
-    if not _sim(cfg.get("Com senha") or "S") or cfg.get("Senha"): return None
+def _nova_senha():
     import secrets
-    nova = "".join(secrets.choice("abcdefghjkmnpqrstuvwxyz23456789") for _ in range(8))
-    estado(xlsx, {"Senha": nova})
+    return "".join(secrets.choice("abcdefghjkmnpqrstuvwxyz23456789") for _ in range(8))
+
+def garantir_senha(xlsx, campo="Senha"):
+    cfg, _ = ler(xlsx)
+    if campo == "Senha" and not _sim(cfg.get("Com senha") or "S"): return None
+    if cfg.get(campo): return None
+    nova = _nova_senha(); estado(xlsx, {campo: nova})
     return nova
 
-def construir(xlsx, media, saida, dir_desenhos=None):
+def assinatura(xlsx, media=None, desenhos=None):
+    """Impressão digital do conteúdo (ficha + ficheiros Media + desenhos). Muda se alguém mexer em qualquer coisa."""
+    import hashlib
+    cfg, secs = ler(xlsx)
+    h = hashlib.sha256(json.dumps({"cfg": {k: v for k, v in cfg.items() if k not in AUTO and k not in ("Senha",)},
+                                   "secs": [{k: v for k, v in s.items() if k not in ("pos",)} for s in secs]},
+                                  ensure_ascii=False, sort_keys=True, default=str).encode())
+    for d in (media, desenhos):
+        if d and Path(d).is_dir():
+            for f in sorted(Path(d).rglob("*")):
+                if f.is_file() and not f.name.startswith(("~$", ".")) and f.name != "hashes.json":
+                    st = f.stat(); h.update(f"{f.relative_to(d)}|{st.st_size}|{int(st.st_mtime)}".encode())
+    return h.hexdigest()[:16]
+
+def construir(xlsx, media, saida, dir_desenhos=None, modo="publicar"):
+    """modo 'draft': pré-visualização interna (senha draft, faixa DRAFT). modo 'publicar': versão do cliente."""
     erros, avisos = validar(xlsx, media)
     if erros: raise SystemExit("ERROS:\n" + "\n".join(erros))
-    senha_nova = garantir_senha(xlsx)
+    senha_nova = garantir_senha(xlsx, "Senha draft" if modo == "draft" else "Senha")
     cfg, secs = ler(xlsx)
+    if modo == "draft":
+        cfg = dict(cfg); cfg["Com senha"] = "S"; cfg["Senha"] = cfg.get("Senha draft")
     langs = idiomas(cfg)
     saida = Path(saida); (saida / "media").mkdir(parents=True, exist_ok=True)
     cache = {}
@@ -667,7 +700,7 @@ def construir(xlsx, media, saida, dir_desenhos=None):
     end = cfg.get("Endereço") or slug(cfg.get("Título PT", ""))
     meta = {"title": titulo, "kicker": _txt({"pt": cfg.get("Barra PT"), "en": cfg.get("Barra EN")}, langs), "logo": logo, "logo2": logo2,
             "autoplay": _sim(cfg.get("Reprodução automática")),
-            "mode": "reel" if (cfg.get("Formato") or "Página").lower().startswith("r") else "pagina"}
+            "mode": "reel" if (cfg.get("Formato") or "Página").lower().startswith("r") else "pagina", "draft": modo == "draft"}
     cfg = dict(cfg); cfg["_marca"] = marca
     one = _sim(cfg.get("One page resumo") or "S")
     fres = Path(dir_desenhos) / "resumo.html" if dir_desenhos else None
@@ -680,8 +713,8 @@ def construir(xlsx, media, saida, dir_desenhos=None):
         avisos.append("One page resumo pedido mas não desenhado (falta resumo.html).")
     _pagina(saida / "index.html", {"meta": meta, "scenes": scenes}, cfg, langs, titulo, slug(end))
     shutil.rmtree(saida / "_baixados", ignore_errors=True)
-    return {"endereco": slug(end), "seccoes": len(scenes), "one_page": bool(meta.get("resumo")),
-            "senha_criada": senha_nova, "com_senha": _sim(cfg.get("Com senha") or "S"), "avisos": avisos, "media": len(cache)}
+    return {"endereco": slug(end), "modo": modo, "assinatura": assinatura(xlsx, media, dir_desenhos),
+            "seccoes": len(scenes), "one_page": bool(meta.get("resumo")), "senha_criada": senha_nova, "com_senha": _sim(cfg.get("Com senha") or "S"), "avisos": avisos, "media": len(cache)}
 
 
 def _pagina(destino, data, cfg, langs, titulo, gid):
@@ -743,7 +776,9 @@ def main():
     a = sp.add_parser("procurar"); a.add_argument("raiz")
     a = sp.add_parser("estado"); a.add_argument("xlsx"); a.add_argument("pares", nargs="+", help='"Campo=valor"')
     a = sp.add_parser("construir"); a.add_argument("xlsx"); a.add_argument("--media", required=True); a.add_argument("--saida", required=True)
-    a.add_argument("--desenhos", help="pasta com cena-<folha>.html (e resumo.html) desenhados à medida")
+    a.add_argument("--desenhos", help="pasta com cena-secao-<n>.html (e resumo.html) desenhados à medida")
+    a.add_argument("--modo", choices=["draft", "publicar"], default="publicar")
+    a = sp.add_parser("assinatura"); a.add_argument("xlsx"); a.add_argument("--media"); a.add_argument("--desenhos")
     x = ap.parse_args()
     j = lambda o: print(json.dumps(o, ensure_ascii=False, indent=1))
     if x.cmd == "modelo": criar_modelo(x.saida, json.load(open(x.exemplo, encoding="utf-8")) if x.exemplo else None)
@@ -754,7 +789,8 @@ def main():
     elif x.cmd == "briefing": j(briefing(x.xlsx))
     elif x.cmd == "procurar": j(procurar(x.raiz))
     elif x.cmd == "estado": estado(x.xlsx, dict(p.split("=", 1) for p in x.pares))
-    elif x.cmd == "construir": j(construir(x.xlsx, x.media, x.saida, x.desenhos))
+    elif x.cmd == "construir": j(construir(x.xlsx, x.media, x.saida, x.desenhos, x.modo))
+    elif x.cmd == "assinatura": print(assinatura(x.xlsx, x.media, x.desenhos))
 
 if __name__ == "__main__":
     main()

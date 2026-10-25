@@ -1,0 +1,241 @@
+<title>Studio YNG</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500..800&family=DM+Sans:opsz,wght@9..40,400..700&display=swap" rel="stylesheet">
+<style>
+/* Mesa de trabalho: barra de marca, formulário de pedido recolhível, lista de apresentações com estado em pílula */
+:root{
+  --bg:#f6f5f3; --surface:#ffffff; --ink:#111111; --soft:#4a4a4a; --mute:#7a7672; --line:#e4e1dd;
+  --brand:#E74F3D; --brand-ink:#ffffff; --blue:#0044FF;
+  --ok:#1f7a4d; --ok-bg:#e3f3ea; --warn:#8a5a00; --warn-bg:#fbefd5; --err:#b3261e; --err-bg:#fbe4e2; --info:#0b3fb8; --info-bg:#e3ebff; --idle-bg:#efedea;
+  --disp:"Bricolage Grotesque","DM Sans",system-ui,sans-serif; --sans:"DM Sans",system-ui,sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c0c0c; --surface:#161616; --ink:#f4f2ef; --soft:#c9c5c0; --mute:#8f8a85; --line:#2a2826;
+  --brand:#ff6a57; --brand-ink:#111111; --blue:#6f93ff;
+  --ok:#6fd39f; --ok-bg:#12291d; --warn:#f0c062; --warn-bg:#2d2412; --err:#ff8a80; --err-bg:#331715; --info:#9db6ff; --info-bg:#141d36; --idle-bg:#222120;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c0c0c; --surface:#161616; --ink:#f4f2ef; --soft:#c9c5c0; --mute:#8f8a85; --line:#2a2826;
+  --brand:#ff6a57; --brand-ink:#111111; --blue:#6f93ff;
+  --ok:#6fd39f; --ok-bg:#12291d; --warn:#f0c062; --warn-bg:#2d2412; --err:#ff8a80; --err-bg:#331715; --info:#9db6ff; --info-bg:#141d36; --idle-bg:#222120;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:1080px;margin:0 auto}
+button,input,select{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;padding-block:28px 22px;border-bottom:2px solid var(--ink)}
+.mark{display:flex;align-items:baseline;gap:10px}
+.mark b{font-family:var(--disp);font-stretch:80%;font-weight:800;font-size:clamp(30px,5vw,44px);letter-spacing:-.01em;line-height:1;text-transform:uppercase}
+.mark b span{color:var(--brand)}
+.mark small{color:var(--mute);font-size:13px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 16px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn[disabled]{opacity:.5;cursor:default}
+.btn.sm{padding:6px 12px;font-size:13px}
+
+.note{margin:18px 0 0;color:var(--soft);max-width:70ch}
+.note[data-k="err"]{color:var(--err)}
+
+#form{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+#form h2{font-family:var(--disp);font-stretch:85%;font-weight:700;font-size:22px;margin:0 0 4px}
+#form p{margin:0 0 16px;color:var(--soft);font-size:14px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:14px}
+label{display:grid;gap:5px;font-size:13px;font-weight:600;color:var(--soft)}
+label i{font-style:normal;font-weight:400;color:var(--mute)}
+input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px}
+.actions .msg{color:var(--err);font-size:14px}
+
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:28px 0 12px}
+.counts{display:flex;flex-wrap:wrap;gap:6px}
+.counts button{border:1px solid var(--line);background:transparent;border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer;color:var(--soft)}
+.counts button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.counts button b{font-variant-numeric:tabular-nums;margin-left:4px}
+#q{max-width:260px}
+
+.list{display:grid;gap:10px}
+.row{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr) auto auto;gap:16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.row h3{margin:0;font-family:var(--disp);font-stretch:85%;font-weight:700;font-size:18px;line-height:1.2;overflow-wrap:anywhere}
+.row .meta{color:var(--mute);font-size:13px;overflow-wrap:anywhere}
+.row .det{font-size:13px;color:var(--soft);min-width:0;overflow-wrap:anywhere}
+.row .det small{display:block;color:var(--mute)}
+.row .go{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700;white-space:nowrap}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.p-pedido{background:var(--idle-bg);color:var(--soft)}
+.p-pronta{background:var(--info-bg);color:var(--info)}
+.p-publicar,.p-a_publicar,.p-gerar_draft,.p-a_gerar_draft{background:var(--warn-bg);color:var(--warn)}
+.p-draft{background:var(--info-bg);color:var(--info);outline:1px solid currentColor}
+.p-publicada{background:var(--ok-bg);color:var(--ok)}
+.p-erro{background:var(--err-bg);color:var(--err)}
+.row .err{grid-column:1/-1;color:var(--err);font-size:13px;margin-top:-4px;white-space:pre-line}
+
+.empty{border:1px dashed var(--line);border-radius:var(--r);padding:28px;color:var(--soft);text-align:left}
+.empty b{display:block;font-family:var(--disp);font-stretch:85%;font-size:20px;color:var(--ink);margin-bottom:4px}
+
+.how{margin-top:36px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:14px}
+.how div{border-top:2px solid var(--ink);padding-top:10px}
+.how b{font-family:var(--disp);font-stretch:85%;font-size:16px}
+.how p{margin:4px 0 0;color:var(--soft);font-size:14px}
+
+@media (max-width:760px){
+  .row{grid-template-columns:1fr auto}
+  .row .det{grid-column:1/-1}
+  .row .go{grid-column:1/-1;justify-content:flex-start}
+  #q{max-width:none;flex:1 1 100%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="mark"><b>Studio <span>YNG</span></b><small>Apresentações YoungNetwork</small></div>
+    <button class="btn primary" id="bNova" type="button">+ Nova apresentação</button>
+  </header>
+  <p class="note" id="note">A carregar as apresentações...</p>
+
+  <form id="form" hidden autocomplete="off">
+    <h2>Nova apresentação</h2>
+    <p>Ao carregar em "Criar ficha", o sistema cria logo a pasta no Studio YNG com a ficha em Excel pronta a preencher. Demora uns minutos; o botão "Abrir Excel" aparece na lista e chega um email.</p>
+    <div class="fields">
+      <label>Nome da apresentação<input id="fNome" required maxlength="80" placeholder="ex.: Galp 2027"></label>
+      <label>Cliente<input id="fCliente" maxlength="80" placeholder="ex.: Galp"></label>
+      <label>Marca que assina<select id="fMarca">
+        <option>YoungNetwork Group</option><option>YN Angola</option><option>YN Moçambique</option><option>YN Color</option><option>Taylor</option><option>Alice</option>
+      </select></label>
+      <label>Formato<select id="fFormato"><option value="Página">Página (scroll com menu)</option><option value="Reel">Reel (corre como um vídeo)</option></select></label>
+      <label>Idiomas<select id="fIdiomas"><option>PT+EN</option><option>PT</option><option>PT+EN+ES</option><option>EN</option></select></label>
+      <label>O seu email <i>(recebe o link e a senha)</i><input id="fEmail" type="email" required placeholder="nome@youngnetworkgroup.com"></label>
+    </div>
+    <div class="actions">
+      <button class="btn primary" type="submit" id="bCriar">Criar ficha</button>
+      <button class="btn" type="button" id="bCancelar">Cancelar</button>
+      <span class="msg" id="fMsg" role="alert"></span>
+    </div>
+  </form>
+
+  <div class="tools">
+    <div class="counts" id="counts"></div>
+    <input id="q" type="search" placeholder="Procurar por nome ou cliente" aria-label="Procurar">
+  </div>
+  <div class="list" id="list"></div>
+
+  <section class="how" aria-label="Como funciona">
+    <div><b>1. Nova apresentação</b><p>Nome, cliente, marca. O sistema cria logo a pasta e a ficha em Excel.</p></div>
+    <div><b>2. Preencher a ficha</b><p>"Abrir Excel": escolher os blocos, escrever as ideias e pedir ao Claude no Excel que escreva os textos. Vídeos na pasta Media ou por link.</p></div>
+    <div><b>3. Gerar draft</b><p>Gera a apresentação num link interno, só para a equipa. Corrigir a ficha e gerar de novo as vezes que for preciso.</p></div>
+    <div><b>4. Publicar</b><p>Com o draft aprovado: sai o link final do cliente, com a senha do cliente, por email.</p></div>
+  </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const ESTADOS={pedido:"A criar ficha",pronta:"Ficha por preencher",gerar_draft:"Draft pedido",a_gerar_draft:"A gerar draft",draft:"Draft pronto",publicar:"Publicação pedida",a_publicar:"A publicar",publicada:"Publicada",erro:"Erro"};
+const ORDEM=["pronta","gerar_draft","a_gerar_draft","draft","publicar","a_publicar","publicada","pedido","erro"];
+const PENDENTES=["pedido","gerar_draft","publicar"];
+let db=null, user=null, mcp=null, rows=[], filtro="", podeEscrever=true, souDono=false, jaDisparei=false;
+const TAREFA="trig_01L5GPAgwVpikyaux9uzNs2o";
+const AVISO_ESPERA="Pedido registado. Arranca assim que o JD abrir o Studio YNG; recebe um email quando estiver pronto.";
+async function disparar(){
+  if(!souDono) return false;
+  try{ if(!mcp) mcp=await claude.use("mcp"); if(!mcp) return false;
+    await mcp.callTool("Claude Code Remote","fire_trigger",{trigger_id:TAREFA}); jaDisparei=true; return true }
+  catch(e){ return false }
+}
+
+const slug=s=>s.normalize("NFKD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,50)||"apresentacao";
+const quando=iso=>{ if(!iso) return ""; try{ return new Date(iso).toLocaleString("pt-PT",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}) }catch(e){ return "" } };
+function el(tag,attrs={},...kids){ const e=document.createElement(tag); for(const [k,v] of Object.entries(attrs)){ if(k==="class") e.className=v; else if(k==="text") e.textContent=v; else e.setAttribute(k,v) } kids.flat().forEach(k=>k&&e.append(k)); return e }
+function nota(t,k){ const n=$("#note"); n.textContent=t; n.dataset.k=k||""; n.hidden=!t }
+
+function render(){
+  const q=$("#q").value.trim().toLowerCase();
+  const cont={}; rows.forEach(r=>cont[r.estado]=(cont[r.estado]||0)+1);
+  const c=$("#counts"); c.replaceChildren(
+    el("button",{type:"button","aria-pressed":String(!filtro),"data-f":""},"Todas",el("b",{text:String(rows.length)})),
+    ...ORDEM.filter(e=>cont[e]).map(e=>el("button",{type:"button","aria-pressed":String(filtro===e),"data-f":e},ESTADOS[e],el("b",{text:String(cont[e])}))));
+  const vis=rows.filter(r=>(!filtro||r.estado===filtro)&&(!q||(r.nome+" "+(r.cliente||"")).toLowerCase().includes(q)))
+                .sort((a,b)=>(b.atualizado_em||b.criado_em||"").localeCompare(a.atualizado_em||a.criado_em||""));
+  const L=$("#list");
+  if(!rows.length){ L.replaceChildren(el("div",{class:"empty"},el("b",{text:"Ainda não há apresentações."}),"Carregue em \"Nova apresentação\" para pedir a primeira. A pasta e o Excel aparecem aqui quando estiverem prontos.")); return }
+  if(!vis.length){ L.replaceChildren(el("div",{class:"empty"},el("b",{text:"Nada encontrado."}),"Mude o filtro ou a pesquisa.")); return }
+  L.replaceChildren(...vis.map(r=>{
+    const go=el("div",{class:"go"});
+    if(r.excel_url) go.append(el("a",{class:"btn sm",href:r.excel_url,target:"_blank",rel:"noopener"},"Abrir Excel"));
+    if(["pronta","draft","publicada","erro"].includes(r.estado)&&podeEscrever)
+      go.append(el("button",{class:"btn sm"+(r.estado==="pronta"?" primary":""),type:"button","data-acao":"gerar_draft","data-id":r.id},r.draft_link?"Gerar novo draft":"Gerar draft"));
+    if(r.draft_link) go.append(el("a",{class:"btn sm",href:r.draft_link,target:"_blank",rel:"noopener"},"Ver draft"));
+    if(r.estado==="draft"&&podeEscrever)
+      go.append(el("button",{class:"btn sm primary",type:"button","data-acao":"publicar","data-id":r.id},r.link?"Publicar alterações":"Publicar"));
+    if(r.link) go.append(el("a",{class:"btn sm",href:r.link,target:"_blank",rel:"noopener"},"Ver apresentação"));
+    const det=el("div",{class:"det"});
+    if(r.estado==="publicada"&&r.publicado_em) det.append(el("span",{text:"Publicada em "+quando(r.publicado_em)}));
+    else if(r.estado==="publicar") det.append(el("span",{text:"Pedida em "+quando(r.pedido_publicar_em)+". "+(r.aviso||"A publicar dentro de minutos.")}));
+    else if(r.estado==="pedido") det.append(el("span",{text:"Pedido em "+quando(r.criado_em)+". "+(r.aviso||"O Excel aparece dentro de minutos.")}));
+    else if(r.estado==="pronta") det.append(el("span",{text:"Preencher a ficha e carregar em Gerar draft."}));
+    else if(r.estado==="gerar_draft") det.append(el("span",{text:"Pedido em "+quando(r.pedido_draft_em)+". "+(r.aviso||"O draft fica pronto dentro de minutos.")}));
+    else if(r.estado==="a_gerar_draft") det.append(el("span",{text:"A gerar o draft."}));
+    else if(r.estado==="draft") det.append(el("span",{text:"Draft de "+quando(r.draft_em)+". Ver, aprovar e publicar. Senha interna no email."}));
+    if(r.pasta) det.append(el("small",{text:r.pasta}));
+    const row=el("div",{class:"row"},
+      el("div",{},el("h3",{text:r.nome}),el("div",{class:"meta",text:[r.cliente,r.marca,r.formato,r.idiomas].filter(Boolean).join(" · ")})),
+      det, el("span",{class:"pill p-"+(r.estado||"pedido"),text:ESTADOS[r.estado]||r.estado}), go);
+    if(r.estado==="erro"&&r.mensagem) row.append(el("div",{class:"err",text:r.mensagem}));
+    return row;
+  }));
+}
+
+$("#counts").addEventListener("click",e=>{ const b=e.target.closest("[data-f]"); if(!b) return; filtro=b.dataset.f; render() });
+$("#q").addEventListener("input",render);
+$("#list").addEventListener("click",async e=>{
+  const b=e.target.closest("[data-acao]"); if(!b||!db) return;
+  const acao=b.dataset.acao, txt=b.textContent, agora=new Date().toISOString();
+  b.disabled=true; b.textContent="A pedir...";
+  const campos=acao==="gerar_draft"?{estado:"gerar_draft",pedido_draft_em:agora}:{estado:"publicar",pedido_publicar_em:agora};
+  try{ await db.collection("apresentacoes").doc(b.dataset.id).update({...campos,atualizado_em:agora,mensagem:""});
+    nota(await disparar()?(acao==="gerar_draft"?"A gerar o draft. O link chega por email dentro de minutos.":"A publicar. O link do cliente chega por email dentro de minutos."):AVISO_ESPERA) }
+  catch(err){ b.disabled=false; b.textContent=txt; nota(err&&err.code==="invalid_argument"?"Não tem permissão nesta página. Peça acesso de Contributor ao JD.":"Não foi possível fazer o pedido. Tente de novo.","err") }
+});
+
+$("#bNova").onclick=()=>{ $("#form").hidden=false; $("#fNome").focus() };
+$("#bCancelar").onclick=()=>{ $("#form").hidden=true; $("#fMsg").textContent="" };
+$("#form").addEventListener("submit",async e=>{
+  e.preventDefault(); $("#fMsg").textContent="";
+  if(!db){ $("#fMsg").textContent="Esta página não consegue gravar aqui. Abra-a no Claude com a sua conta YoungNetwork."; return }
+  const nome=$("#fNome").value.trim(), email=$("#fEmail").value.trim();
+  if(!nome){ $("#fMsg").textContent="Falta o nome da apresentação."; return }
+  if(!/^\S+@\S+\.\S+$/.test(email)){ $("#fMsg").textContent="O email não parece válido."; return }
+  const base=slug(nome); let id=base, n=2; while(rows.some(r=>r.id===id)) id=base+"-"+(n++);
+  const agora=new Date().toISOString();
+  $("#bCriar").disabled=true;
+  try{
+    await db.collection("apresentacoes").doc(id).set({nome,cliente:$("#fCliente").value.trim(),marca:$("#fMarca").value,formato:$("#fFormato").value,
+      idiomas:$("#fIdiomas").value,pedido_por:email,criado_por:(user&&await user.id())||null,criado_em:agora,atualizado_em:agora,estado:"pedido"});
+    $("#form").reset(); $("#form").hidden=true; filtro=""; nota(await disparar()?"A criar a ficha. O Excel aparece aqui dentro de minutos e chega um email.":AVISO_ESPERA);
+    try{ const m=user&&await user.email(); if(m) $("#fEmail").value=m }catch(e){}
+  }catch(err){
+    $("#fMsg").textContent=err&&err.code==="invalid_argument"?"Não tem permissão para criar apresentações nesta página. Peça acesso de Contributor ao JD.":
+      err&&err.code==="quota_exceeded"?"A base de dados está cheia. Avise o JD.":"Não foi possível gravar o pedido. Tente de novo.";
+  }finally{ $("#bCriar").disabled=false }
+});
+
+(async()=>{
+  render();
+  [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
+  souDono=!!(user&&await user.isOwner());
+  if(user){ try{ const m=await user.email(); if(m) $("#fEmail").value=m }catch(e){} const w=await user.can("data.write"); if(w===false){ podeEscrever=false; $("#bNova").hidden=true } }
+  if(!db){ nota("Esta vista não consegue ler as apresentações. Abra a página no Claude com a sua conta YoungNetwork."); return }
+  db.collection("apresentacoes").onSnapshot(s=>{
+    rows=s.docs.map(d=>({id:d.id,...d.data()})); nota(podeEscrever?"":"Pode ver as apresentações, mas não criar nem publicar. Peça acesso de Contributor ao JD."); render();
+    if(souDono&&!jaDisparei&&!s.metadata.fromCache&&rows.some(r=>PENDENTES.includes(r.estado))){ jaDisparei=true; disparar().then(ok=>{ if(ok) nota("Havia pedidos em espera: já arrancaram.") }) }
+  },err=>nota(err&&err.code==="revoked"?"O acesso a esta página mudou. Recarregue.":"Perdi a ligação às apresentações. Recarregue a página.","err"));
+})();
+</script>
