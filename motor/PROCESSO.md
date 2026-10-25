@@ -12,7 +12,7 @@
 ## Circuito
 1. Nova apresentação (painel): o sistema cria a pasta e a ficha. Estado: Ficha por preencher.
 2. Preencher a ficha: blocos, Ideias, o Claude no Excel escreve os textos (folha "Claude"), vídeos na Media.
-3. Gerar draft (painel): desenha, traduz, gera a pré-visualização interna com a senha draft, email. Repetível.
+3. Gerar draft (painel): desenha, traduz, gera a pré-visualização interna com a senha draft, email. Repetível. Para pedir mudanças: "Comentar draft" no painel (o sistema aplica os comentários no draft seguinte e regista-os na ficha, em "Como deve ficar") ou corrigir a ficha.
 4. Publicar (painel): só a partir de um draft. Se a ficha ou a Media mudaram depois do draft, recusa e pede draft novo. Sai o link do cliente com a senha do cliente, email.
 
 ## Limites

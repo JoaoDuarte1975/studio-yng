@@ -757,6 +757,23 @@ def procurar(raiz):
             out.append({"xlsx": str(x), "pasta": str(x.parent), "pedido_por": cfg.get("Pedido por", ""), "titulo": cfg.get("Título PT", "")})
     return out
 
+def comentario(xlsx, secao, texto):
+    """Junta um comentário ao 'Como deve ficar' da secção (número ou nome no menu)."""
+    _, secs = ler(xlsx)
+    alvo = None
+    for s in secs:
+        menu = (s["menu"] or {}).get("pt") or ""
+        if str(s["n"]) == str(secao).strip() or menu.strip().lower() == str(secao).strip().lower():
+            alvo = s; break
+    if not alvo: raise SystemExit(f"Secção '{secao}' não encontrada.")
+    i = [c[1] for c in CAMPOS_CAB].index("pedido")
+    wb = openpyxl.load_workbook(xlsx); ws = wb[FOLHA]
+    c = ws.cell(alvo["_linha"] + 3 + i, 2)
+    atual = _v(c.value)
+    c.value = (atual + "\n" if atual else "") + texto
+    wb.save(xlsx)
+    return {"secao": alvo["n"], "bloco": alvo["bloco"], "como_deve_ficar": c.value}
+
 def estado(xlsx, valores):
     wb = openpyxl.load_workbook(xlsx); ws = wb["Configuração"]
     for r in ws.iter_rows(min_row=2):
@@ -775,6 +792,7 @@ def main():
     a = sp.add_parser("briefing"); a.add_argument("xlsx")
     a = sp.add_parser("procurar"); a.add_argument("raiz")
     a = sp.add_parser("estado"); a.add_argument("xlsx"); a.add_argument("pares", nargs="+", help='"Campo=valor"')
+    a = sp.add_parser("comentario"); a.add_argument("xlsx"); a.add_argument("secao"); a.add_argument("texto")
     a = sp.add_parser("construir"); a.add_argument("xlsx"); a.add_argument("--media", required=True); a.add_argument("--saida", required=True)
     a.add_argument("--desenhos", help="pasta com cena-secao-<n>.html (e resumo.html) desenhados à medida")
     a.add_argument("--modo", choices=["draft", "publicar"], default="publicar")
@@ -789,6 +807,7 @@ def main():
     elif x.cmd == "briefing": j(briefing(x.xlsx))
     elif x.cmd == "procurar": j(procurar(x.raiz))
     elif x.cmd == "estado": estado(x.xlsx, dict(p.split("=", 1) for p in x.pares))
+    elif x.cmd == "comentario": j(comentario(x.xlsx, x.secao, x.texto))
     elif x.cmd == "construir": j(construir(x.xlsx, x.media, x.saida, x.desenhos, x.modo))
     elif x.cmd == "assinatura": print(assinatura(x.xlsx, x.media, x.desenhos))
 

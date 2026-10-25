@@ -20,6 +20,7 @@ Lista a coleção `apresentacoes`. Trata, por esta ordem, os documentos em `pedi
 
 ### estado = "gerar_draft"
 1. Atualiza para "a_gerar_draft".
+1b. Comentários: lê a coleção `apresentacoes/<id>/comentarios` e trata os que têm estado "novo", do mais antigo para o mais recente. Para cada um, identifica a secção (pelo nome no menu, nome do bloco ou número). Se o comentário pede para mudar texto ou números, corrige esses campos na folha Conteúdo (só com o que o comentário diz, nada inventado). Em todos os casos regista-o com `gerar.py comentario <xlsx> <n.º da secção> "[dd/mm · <por>] <texto>"`, para o desenho dessa secção ser refeito. Se não perceberes a que secção se refere, deixa-o "novo" e junta à mensagem "Comentário não aplicado: <texto>". Marca os aplicados com estado "aplicado" e aplicado_em; no fim põe `coment_novos` = número dos que ficaram por aplicar.
 2. `gerar.py validar <xlsx> --media <Media>`. Com erros: estado "erro", mensagem com os erros (um por linha), email a pedido_por. Passa ao seguinte.
 3. `gerar.py briefing` e desenha cada secção segundo GUIA-DESENHO.md em `_desenhos/cena-secao-<n>.html` (e `resumo.html` se one_page). Reaproveita um desenho se o conteúdo dessa secção não mudou (resumo do conteúdo em `_desenhos/hashes.json`).
 4. `gerar.py pendentes`, traduz de português para inglês, `gerar.py traduzir`.
@@ -27,11 +28,12 @@ Lista a coleção `apresentacoes`. Trata, por esta ordem, os documentos em `pedi
 6. Verifica no contentor (Playwright) a 1366 px e 375 px, PT e EN, com a senha draft. Corrige o que estiver partido e repete 5.
 7. Copia a pasta gerada para o contentor (device_stage_files, até 50 ficheiros por chamada), põe-na em `<clone>/drafts/<id>-<chave>/` substituindo a anterior, commit e push para main.
 8. Atualiza o documento: estado "draft", draft_link, draft_em, draft_assinatura = assinatura, draft_chave, mensagem com avisos, atualizado_em. No Excel (`gerar.py estado`): Estado = Draft, Link draft, Draft gerado em.
-9. Email a pedido_por: link do draft, senha draft (lida do Excel, campo "Senha draft"), avisos, e que é só para a equipa; quando aprovado, carregar em "Publicar".
+9. Email a pedido_por: link do draft, comentários aplicados neste draft (se houve), senha draft (lida do Excel, campo "Senha draft"), avisos, e que é só para a equipa; quando aprovado, carregar em "Publicar".
 
 ### estado = "publicar"
 1. Atualiza para "a_publicar".
-2. `gerar.py assinatura <xlsx> --media <Media> --desenhos <_desenhos>`. Se for diferente de `draft_assinatura`: estado "erro", mensagem "A ficha ou a Media mudaram depois do draft. Gere um draft novo e publique depois de o ver.", email a pedido_por. Passa ao seguinte. Não redesenha nada neste passo.
+2. Se `coment_novos` > 0: estado "erro", mensagem "Há comentários por aplicar. Gere um draft novo antes de publicar.", sem email. Passa ao seguinte.
+2b. `gerar.py assinatura <xlsx> --media <Media> --desenhos <_desenhos>`. Se for diferente de `draft_assinatura`: estado "erro", mensagem "A ficha ou a Media mudaram depois do draft. Gere um draft novo e publique depois de o ver.", email a pedido_por. Passa ao seguinte. Não redesenha nada neste passo.
 3. `gerar.py construir <xlsx> --media <Media> --saida "$HOME/mnt/Studio YNG/_Sistema/_publicar/<id>" --desenhos <_desenhos> --modo publicar` (cria a senha do cliente se faltar).
 4. Verificação rápida (abre com a senha do cliente, PT e EN).
 5. Copia para `<clone>/<id>/` substituindo a anterior, commit e push para main.

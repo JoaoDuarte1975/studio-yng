@@ -86,6 +86,14 @@ input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-ra
 .how b{font-family:var(--disp);font-stretch:85%;font-size:16px}
 .how p{margin:4px 0 0;color:var(--soft);font-size:14px}
 
+.coment{grid-column:1/-1;border-top:1px solid var(--line);padding-top:12px;margin-top:4px;display:grid;gap:10px}
+.coment p{margin:0;color:var(--soft);font-size:14px}
+.coment textarea{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);color:var(--ink);resize:vertical}
+.clist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.clist li{border-left:3px solid var(--brand);padding:4px 10px;font-size:14px;display:grid}
+.clist li.ok{border-left-color:var(--line);color:var(--soft)}
+.clist b{font-size:12px;color:var(--mute);font-weight:600}
+
 @media (max-width:760px){
   .row{grid-template-columns:1fr auto}
   .row .det{grid-column:1/-1}
@@ -131,7 +139,7 @@ input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-ra
   <section class="how" aria-label="Como funciona">
     <div><b>1. Nova apresentação</b><p>Nome, cliente, marca. O sistema cria logo a pasta e a ficha em Excel.</p></div>
     <div><b>2. Preencher a ficha</b><p>"Ficha do Deck": escolher os blocos, escrever as ideias e, se quiser, pedir ao Claude no Excel para escrever os textos. Vídeos na pasta Media ou por link.</p></div>
-    <div><b>3. Gerar draft</b><p>Gera a apresentação num link interno, só para a equipa. Corrigir a ficha e gerar de novo as vezes que for preciso.</p></div>
+    <div><b>3. Gerar draft</b><p>Gera a apresentação num link interno, só para a equipa. Para mudar, "Comentar draft" (ou corrigir a ficha) e gerar de novo as vezes que for preciso.</p></div>
     <div><b>4. Publicar</b><p>Com o draft aprovado: sai o link final para o consultor, para apresentar ou enviar ao cliente por email.</p></div>
   </section>
 </div>
@@ -141,7 +149,7 @@ const $=s=>document.querySelector(s);
 const ESTADOS={pedido:"A criar ficha",pronta:"Ficha por preencher",gerar_draft:"Draft pedido",a_gerar_draft:"A gerar draft",draft:"Draft pronto",publicar:"Publicação pedida",a_publicar:"A publicar",publicada:"Publicada",erro:"Erro"};
 const ORDEM=["pronta","gerar_draft","a_gerar_draft","draft","publicar","a_publicar","publicada","pedido","erro"];
 const PENDENTES=["pedido","gerar_draft","publicar"];
-let db=null, user=null, mcp=null, rows=[], filtro="", podeEscrever=true, souDono=false, jaDisparei=false;
+let db=null, user=null, mcp=null, rows=[], aberto=null, comentCache={}, filtro="", podeEscrever=true, souDono=false, jaDisparei=false;
 const TAREFA="trig_01L5GPAgwVpikyaux9uzNs2o";
 const AVISO_ESPERA="Pedido registado. Arranca assim que o JD abrir o Studio YNG; recebe um email quando estiver pronto.";
 async function disparar(){
@@ -175,6 +183,8 @@ function render(){
     if(r.draft_link) go.append(el("a",{class:"btn sm",href:r.draft_link,target:"_blank",rel:"noopener"},"Ver draft"));
     if(r.estado==="draft"&&podeEscrever)
       go.append(el("button",{class:"btn sm primary",type:"button","data-acao":"publicar","data-id":r.id},r.link?"Publicar alterações":"Publicar"));
+    if(r.draft_link&&["draft","publicada","erro"].includes(r.estado)&&podeEscrever)
+      go.append(el("button",{class:"btn sm",type:"button","data-coment":r.id,"aria-expanded":String(aberto===r.id)},r.coment_novos?"Comentar draft ("+r.coment_novos+")":"Comentar draft"));
     if(r.link) go.append(el("a",{class:"btn sm",href:r.link,target:"_blank",rel:"noopener"},"Ver apresentação"));
     const det=el("div",{class:"det"});
     if(r.estado==="publicada"&&r.publicado_em) det.append(el("span",{text:"Publicada em "+quando(r.publicado_em)}));
@@ -189,13 +199,50 @@ function render(){
       el("div",{},el("h3",{text:r.nome}),el("div",{class:"meta",text:[r.cliente,r.marca,r.formato,r.idiomas].filter(Boolean).join(" · ")})),
       det, el("span",{class:"pill p-"+(r.estado||"pedido"),text:ESTADOS[r.estado]||r.estado}), go);
     if(r.estado==="erro"&&r.mensagem) row.append(el("div",{class:"err",text:r.mensagem}));
+    if(aberto===r.id) row.append(caixaComent(r));
     return row;
   }));
+}
+
+function caixaComent(r){
+  const lista=el("ul",{class:"clist"});
+  (comentCache[r.id]||[]).forEach(c=>lista.append(el("li",{class:c.estado==="aplicado"?"ok":""},
+    el("b",{text:(c.por||"")+" · "+quando(c.em)+(c.estado==="aplicado"?" · aplicado":" · por aplicar")}),el("span",{text:c.texto}))));
+  const ta=el("textarea",{rows:"3",maxlength:"1500",placeholder:"Diga a secção e o que mudar. Ex.: Chiquita: pôr o vídeo em primeiro. Números: menos texto por baixo."});
+  const msg=el("span",{class:"msg",role:"alert"});
+  const b1=el("button",{class:"btn sm",type:"button"},"Guardar comentário");
+  const b2=el("button",{class:"btn sm primary",type:"button"},"Guardar e gerar draft novo");
+  const enviar=async gerar=>{
+    const texto=ta.value.trim(); if(!texto&&!gerar){ msg.textContent="Escreva o comentário."; return }
+    b1.disabled=b2.disabled=true; msg.textContent="";
+    const agora=new Date().toISOString();
+    try{
+      const ref=db.collection("apresentacoes").doc(r.id);
+      if(texto){ let por=""; try{ por=(user&&await user.name())||"" }catch(e){}
+        await ref.collection("comentarios").add({texto,por,em:agora,estado:"novo"});
+        await ref.update({coment_novos:(r.coment_novos||0)+1,atualizado_em:agora}) }
+      ta.value=""; await carregarComent(r.id);
+      if(gerar){ await ref.update({estado:"gerar_draft",pedido_draft_em:agora,atualizado_em:agora,mensagem:""}); aberto=null; render();
+        nota(await disparar()?"A gerar o draft novo com os comentários. O link chega por email dentro de minutos.":AVISO_ESPERA) }
+      else { nota("Comentário guardado. Entra no próximo draft."); render() }
+    }catch(err){ msg.textContent=err&&err.code==="invalid_argument"?"Não tem permissão. Peça acesso de Contributor ao JD.":"Não foi possível guardar. Tente de novo."; b1.disabled=b2.disabled=false }
+  };
+  b1.onclick=()=>enviar(false); b2.onclick=()=>enviar(true);
+  return el("div",{class:"coment"},
+    el("p",{text:"Os comentários entram no próximo draft: o sistema aplica-os às secções indicadas e regista-os na Ficha do Deck, no campo \"Como deve ficar\"."}),
+    lista.children.length?lista:"", ta, el("div",{class:"actions"},b1,b2,msg));
+}
+async function carregarComent(id){
+  try{ const q=await db.collection("apresentacoes").doc(id).collection("comentarios").get();
+    comentCache[id]=q.docs.map(d=>d.data()).sort((a,b)=>(a.em||"").localeCompare(b.em||"")) }catch(e){ comentCache[id]=[] }
 }
 
 $("#counts").addEventListener("click",e=>{ const b=e.target.closest("[data-f]"); if(!b) return; filtro=b.dataset.f; render() });
 $("#q").addEventListener("input",render);
 $("#list").addEventListener("click",async e=>{
+  const cb=e.target.closest("[data-coment]");
+  if(cb&&db){ const id=cb.dataset.coment; if(aberto===id){ aberto=null; render(); return } aberto=id; await carregarComent(id); render();
+    const t=document.querySelector(".coment textarea"); if(t) t.focus(); return }
   const b=e.target.closest("[data-acao]"); if(!b||!db) return;
   const acao=b.dataset.acao, txt=b.textContent, agora=new Date().toISOString();
   b.disabled=true; b.textContent="A pedir...";
