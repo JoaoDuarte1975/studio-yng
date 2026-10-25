@@ -1,0 +1,139 @@
+{
+ "config": {
+  "Título PT": "Exemplo: proposta de lançamento",
+  "Barra PT": "YoungNetwork · Exemplo de teste",
+  "Cliente": "Cliente Exemplo",
+  "Endereço": "exemplo-teste",
+  "Marca": "YoungNetwork Group",
+  "Com senha": "S",
+  "Formato": "Página",
+  "Idiomas": "PT+EN",
+  "One page resumo": "S",
+  "Pedido por": "joaoduarte@youngnetworkgroup.com",
+  "Estado": "Draft"
+ },
+ "seccoes": [
+  {
+   "Bloco": "Capa",
+   "cab": {
+    "Pequeno título": "Proposta · Exemplo",
+    "Título": "Lançamos a marca em 30 dias.",
+    "Texto": "Conteúdo fictício, só para testar a ferramenta. Todas as datas e números desta página são de exemplo.",
+    "Ficheiro ou link": "fundo.mp4",
+    "Como deve ficar": "Capa grande com o vídeo de fundo, logótipos em cima, dois botões: ver calendário e ver entregas."
+   }
+  },
+  {
+   "Bloco": "Calendário",
+   "Nome no menu": "Calendário",
+   "cab": {
+    "Pequeno título": "Calendário",
+    "Título": "Quatro semanas, quatro fases.",
+    "Ideias": "4 semanas: diagnóstico, criação, produção, lançamento"
+   },
+   "lista": [
+    {
+     "Dia ou data": "S1",
+     "O que acontece": "Diagnóstico",
+     "Descrição": "Reuniões e recolha de materiais."
+    },
+    {
+     "Dia ou data": "S2",
+     "O que acontece": "Criação",
+     "Descrição": "Conceito e peças."
+    },
+    {
+     "Dia ou data": "S3",
+     "O que acontece": "Produção",
+     "Descrição": "Filmagens e adaptações."
+    },
+    {
+     "Dia ou data": "S4",
+     "O que acontece": "Lançamento",
+     "Descrição": "Publicação e relatório."
+    }
+   ]
+  },
+  {
+   "Bloco": "Cartões com filtro",
+   "Nome no menu": "Entregas",
+   "cab": {
+    "Pequeno título": "Entregas",
+    "Título": "O que entregamos."
+   },
+   "lista": [
+    {
+     "Filtro": "Semana 1",
+     "Categoria": "Estratégia",
+     "Título": "Plano de comunicação",
+     "Texto": "Documento com objetivos e calendário."
+    },
+    {
+     "Filtro": "Semana 2",
+     "Categoria": "Social",
+     "Título": "Peças para redes",
+     "Texto": "Posts e stories.",
+     "Número": "12",
+     "Unidade": "por mês"
+    },
+    {
+     "Filtro": "Semana 3",
+     "Categoria": "Vídeo",
+     "Título": "Vídeo de lançamento",
+     "Texto": "Versões horizontal e vertical."
+    },
+    {
+     "Incluir": "N",
+     "Filtro": "Semana 4",
+     "Título": "Item escondido",
+     "Texto": "Não deve aparecer."
+    }
+   ]
+  },
+  {
+   "Bloco": "Vídeos e trabalhos",
+   "Nome no menu": "Trabalhos",
+   "cab": {
+    "Pequeno título": "Trabalhos",
+    "Título": "Três vídeos de teste."
+   },
+   "lista": [
+    {
+     "Ficheiro ou link": "case-1.mp4",
+     "Cliente ou categoria": "Teste",
+     "Título": "Vídeo um"
+    },
+    {
+     "Ficheiro ou link": "case-2.mp4",
+     "Cliente ou categoria": "Teste",
+     "Título": "Vídeo dois"
+    },
+    {
+     "Ficheiro ou link": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+     "Cliente ou categoria": "YouTube",
+     "Título": "Vídeo do YouTube"
+    }
+   ]
+  },
+  {
+   "Bloco": "Equipa",
+   "Nome no menu": "Equipa",
+   "Incluir": "N"
+  },
+  {
+   "Bloco": "Contactos",
+   "Nome no menu": "Contacto",
+   "cab": {
+    "Pequeno título": "Contacto",
+    "Título": "Falamos?"
+   },
+   "lista": [
+    {
+     "Nome": "JD",
+     "Função": "CEO · YoungNetwork Group",
+     "Email": "joaoduarte@youngnetworkgroup.com"
+    }
+   ]
+  }
+ ]
+}
