@@ -16,7 +16,7 @@ Lista a coleção `apresentacoes`. Trata, por esta ordem, os documentos em `pedi
 2. Cria a ficha `Apresentação.xlsx` com `gerar.py modelo <xlsx> --exemplo <json>`, onde o json tem só `{"config": {...}}` com: Título PT = nome, Cliente, Endereço = id do documento, Marca, Formato, Idiomas, Pedido por = pedido_por, Estado = Ficha.
 3. Confirma que o OneDrive já carregou a ficha para a nuvem: Microsoft 365 `read_resource` em `file:///b!s1pyPEeL_E6qEUBbdT8eCcLWCUxIZwFAoTIiFjdm2GLMHrObe6wgTq21kDBPLOrA/Studio YNG/Apresentações/<nome>` até aparecer `Apresentação.xlsx` (tenta de 30 em 30 segundos, até 10 minutos). Se não aparecer: estado "erro", mensagem "A ficha foi criada no PC do JD mas o OneDrive ainda não a sincronizou. Verifique o OneDrive no PC e carregue outra vez.", e passa ao seguinte sem email.
 4. Atualiza o documento: estado "pronta", pasta (texto "Studio YNG > Apresentações > <nome>"), excel_url = https://youngnetworkgroup-my.sharepoint.com/personal/joaoduarte_youngnetworkgroup_com/Documents/Studio%20YNG/Apresenta%C3%A7%C3%B5es/<nome codificado>/Apresenta%C3%A7%C3%A3o.xlsx?web=1, atualizado_em.
-5. Email a pedido_por: a ficha está pronta, link do Excel, que escreva as ideias e use o Claude no Excel (folha "Claude"), vídeos na pasta Media, e que no fim é carregar em "Gerar draft" no Studio YNG.
+5. Email a pedido_por: a ficha está pronta, link da Ficha do Deck, que escreva as ideias e use o Claude no Excel (folha "Claude"), vídeos na pasta Media, e que no fim é carregar em "Gerar draft" no Studio YNG.
 
 ### estado = "gerar_draft"
 1. Atualiza para "a_gerar_draft".
