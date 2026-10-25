@@ -14,7 +14,7 @@ Lista a coleção `apresentacoes`. Trata, por esta ordem, os documentos em `pedi
 ### estado = "pedido" (criar a ficha)
 1. Pasta = `Studio YNG/Apresentações/<nome>` (se já existir, acrescenta " 2", " 3"...). Cria lá `Media/` e `_desenhos/`.
 2. Cria a ficha `Apresentação.xlsx` com `gerar.py modelo <xlsx> --exemplo <json>`, onde o json tem só `{"config": {...}}` com: Título PT = nome, Cliente, Endereço = id do documento, Marca, Formato, Idiomas, Pedido por = pedido_por, Estado = Ficha.
-3. Atualiza o documento: estado "pronta", pasta (texto "Studio YNG > Apresentações > <nome>"), excel_url = https://youngnetworkgroup-my.sharepoint.com/:x:/r/personal/joaoduarte_youngnetworkgroup_com/Documents/Studio%20YNG/Apresenta%C3%A7%C3%B5es/<nome codificado>/Apresenta%C3%A7%C3%A3o.xlsx?web=1, atualizado_em.
+3. Atualiza o documento: estado "pronta", pasta (texto "Studio YNG > Apresentações > <nome>"), excel_url = https://youngnetworkgroup-my.sharepoint.com/personal/joaoduarte_youngnetworkgroup_com/Documents/Studio%20YNG/Apresenta%C3%A7%C3%B5es/<nome codificado>/Apresenta%C3%A7%C3%A3o.xlsx?web=1, atualizado_em.
 4. Email a pedido_por: a ficha está pronta, link do Excel, que escreva as ideias e use o Claude no Excel (folha "Claude"), vídeos na pasta Media, e que no fim é carregar em "Gerar draft" no Studio YNG.
 
 ### estado = "gerar_draft"

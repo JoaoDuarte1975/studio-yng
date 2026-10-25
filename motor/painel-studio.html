@@ -1,4 +1,4 @@
-<title>Studio YNG</title>
+<title>Decks YoungNetwork Group</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500..800&family=DM+Sans:opsz,wght@9..40,400..700&display=swap" rel="stylesheet">
@@ -30,10 +30,10 @@ a{color:inherit}
 :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 
 header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;padding-block:28px 22px;border-bottom:2px solid var(--ink)}
-.mark{display:flex;align-items:baseline;gap:10px}
+.mark{display:flex;flex-direction:column;gap:6px}
 .mark b{font-family:var(--disp);font-stretch:80%;font-weight:800;font-size:clamp(30px,5vw,44px);letter-spacing:-.01em;line-height:1;text-transform:uppercase}
 .mark b span{color:var(--brand)}
-.mark small{color:var(--mute);font-size:13px}
+.mark small{order:-1;color:var(--soft);font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
 .btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 16px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .btn:hover{border-color:var(--ink)}
 .btn.primary{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
@@ -97,14 +97,14 @@ input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-ra
 
 <div class="wrap">
   <header>
-    <div class="mark"><b>Studio <span>YNG</span></b><small>Apresentações YoungNetwork</small></div>
+    <div class="mark"><b>Studio <span>YNG</span></b><small>Decks YoungNetwork Group</small></div>
     <button class="btn primary" id="bNova" type="button">+ Nova apresentação</button>
   </header>
   <p class="note" id="note">A carregar as apresentações...</p>
 
   <form id="form" hidden autocomplete="off">
     <h2>Nova apresentação</h2>
-    <p>Ao carregar em "Criar ficha", o sistema cria logo a pasta no Studio YNG com a ficha em Excel pronta a preencher. Demora uns minutos; o botão "Abrir Excel" aparece na lista e chega um email.</p>
+    <p>Ao carregar em "Criar ficha", o sistema cria logo a pasta no Studio YNG com a ficha em Excel pronta a preencher. Demora uns minutos; o botão "Ficha do Deck" aparece na lista e chega um email.</p>
     <div class="fields">
       <label>Nome da apresentação<input id="fNome" required maxlength="80" placeholder="ex.: Galp 2027"></label>
       <label>Cliente<input id="fCliente" maxlength="80" placeholder="ex.: Galp"></label>
@@ -130,7 +130,7 @@ input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-ra
 
   <section class="how" aria-label="Como funciona">
     <div><b>1. Nova apresentação</b><p>Nome, cliente, marca. O sistema cria logo a pasta e a ficha em Excel.</p></div>
-    <div><b>2. Preencher a ficha</b><p>"Abrir Excel": escolher os blocos, escrever as ideias e pedir ao Claude no Excel que escreva os textos. Vídeos na pasta Media ou por link.</p></div>
+    <div><b>2. Preencher a ficha</b><p>"Ficha do Deck": escolher os blocos, escrever as ideias e pedir ao Claude no Excel que escreva os textos. Vídeos na pasta Media ou por link.</p></div>
     <div><b>3. Gerar draft</b><p>Gera a apresentação num link interno, só para a equipa. Corrigir a ficha e gerar de novo as vezes que for preciso.</p></div>
     <div><b>4. Publicar</b><p>Com o draft aprovado: sai o link final do cliente, com a senha do cliente, por email.</p></div>
   </section>
@@ -165,11 +165,11 @@ function render(){
   const vis=rows.filter(r=>(!filtro||r.estado===filtro)&&(!q||(r.nome+" "+(r.cliente||"")).toLowerCase().includes(q)))
                 .sort((a,b)=>(b.atualizado_em||b.criado_em||"").localeCompare(a.atualizado_em||a.criado_em||""));
   const L=$("#list");
-  if(!rows.length){ L.replaceChildren(el("div",{class:"empty"},el("b",{text:"Ainda não há apresentações."}),"Carregue em \"Nova apresentação\" para pedir a primeira. A pasta e o Excel aparecem aqui quando estiverem prontos.")); return }
+  if(!rows.length){ L.replaceChildren(el("div",{class:"empty"},el("b",{text:"Ainda não há apresentações."}),"Carregue em \"Nova apresentação\" para pedir a primeira. A pasta e a ficha aparecem aqui quando estiverem prontos.")); return }
   if(!vis.length){ L.replaceChildren(el("div",{class:"empty"},el("b",{text:"Nada encontrado."}),"Mude o filtro ou a pesquisa.")); return }
   L.replaceChildren(...vis.map(r=>{
     const go=el("div",{class:"go"});
-    if(r.excel_url) go.append(el("a",{class:"btn sm",href:r.excel_url,target:"_blank",rel:"noopener"},"Abrir Excel"));
+    if(r.excel_url) go.append(el("a",{class:"btn sm",href:r.excel_url,target:"_blank",rel:"noopener"},"Ficha do Deck"));
     if(["pronta","draft","publicada","erro"].includes(r.estado)&&podeEscrever)
       go.append(el("button",{class:"btn sm"+(r.estado==="pronta"?" primary":""),type:"button","data-acao":"gerar_draft","data-id":r.id},r.draft_link?"Gerar novo draft":"Gerar draft"));
     if(r.draft_link) go.append(el("a",{class:"btn sm",href:r.draft_link,target:"_blank",rel:"noopener"},"Ver draft"));
@@ -179,7 +179,7 @@ function render(){
     const det=el("div",{class:"det"});
     if(r.estado==="publicada"&&r.publicado_em) det.append(el("span",{text:"Publicada em "+quando(r.publicado_em)}));
     else if(r.estado==="publicar") det.append(el("span",{text:"Pedida em "+quando(r.pedido_publicar_em)+". "+(r.aviso||"A publicar dentro de minutos.")}));
-    else if(r.estado==="pedido") det.append(el("span",{text:"Pedido em "+quando(r.criado_em)+". "+(r.aviso||"O Excel aparece dentro de minutos.")}));
+    else if(r.estado==="pedido") det.append(el("span",{text:"Pedido em "+quando(r.criado_em)+". "+(r.aviso||"A ficha aparece dentro de minutos.")}));
     else if(r.estado==="pronta") det.append(el("span",{text:"Preencher a ficha e carregar em Gerar draft."}));
     else if(r.estado==="gerar_draft") det.append(el("span",{text:"Pedido em "+quando(r.pedido_draft_em)+". "+(r.aviso||"O draft fica pronto dentro de minutos.")}));
     else if(r.estado==="a_gerar_draft") det.append(el("span",{text:"A gerar o draft."}));
@@ -219,7 +219,7 @@ $("#form").addEventListener("submit",async e=>{
   try{
     await db.collection("apresentacoes").doc(id).set({nome,cliente:$("#fCliente").value.trim(),marca:$("#fMarca").value,formato:$("#fFormato").value,
       idiomas:$("#fIdiomas").value,pedido_por:email,criado_por:(user&&await user.id())||null,criado_em:agora,atualizado_em:agora,estado:"pedido"});
-    $("#form").reset(); $("#form").hidden=true; filtro=""; nota(await disparar()?"A criar a ficha. O Excel aparece aqui dentro de minutos e chega um email.":AVISO_ESPERA);
+    $("#form").reset(); $("#form").hidden=true; filtro=""; nota(await disparar()?"A criar a ficha. A ficha aparece aqui dentro de minutos e chega um email.":AVISO_ESPERA);
     try{ const m=user&&await user.email(); if(m) $("#fEmail").value=m }catch(e){}
   }catch(err){
     $("#fMsg").textContent=err&&err.code==="invalid_argument"?"Não tem permissão para criar apresentações nesta página. Peça acesso de Contributor ao JD.":
