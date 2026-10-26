@@ -89,6 +89,12 @@ input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-ra
 .coment{grid-column:1/-1;border-top:1px solid var(--line);padding-top:12px;margin-top:4px;display:grid;gap:10px}
 .coment p{margin:0;color:var(--soft);font-size:14px}
 .coment textarea{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);color:var(--ink);resize:vertical}
+.cgrupos{display:grid;gap:10px}
+.cgrupo h4{margin:0 0 4px;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
+.cnovos{display:grid;gap:10px}
+.cnovo{display:grid;grid-template-columns:minmax(150px,220px) minmax(0,1fr) auto;gap:8px;align-items:start}
+.cnovo select{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);color:var(--ink)}
+@media (max-width:640px){.cnovo{grid-template-columns:1fr}}
 .clist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .clist li{border-left:3px solid var(--brand);padding:4px 10px;font-size:14px;display:grid}
 .clist li.ok{border-left-color:var(--line);color:var(--soft)}
@@ -149,14 +155,16 @@ const $=s=>document.querySelector(s);
 const ESTADOS={pedido:"A criar ficha",pronta:"Ficha por preencher",gerar_draft:"Draft pedido",a_gerar_draft:"A gerar draft",draft:"Draft pronto",publicar:"Publicação pedida",a_publicar:"A publicar",publicada:"Publicada",erro:"Erro"};
 const ORDEM=["pronta","gerar_draft","a_gerar_draft","draft","publicar","a_publicar","publicada","pedido","erro"];
 const PENDENTES=["pedido","gerar_draft","publicar"];
-let db=null, user=null, mcp=null, rows=[], aberto=null, comentCache={}, filtro="", podeEscrever=true, souDono=false, jaDisparei=false;
+let db=null, user=null, mcp=null, rows=[], aberto=null, comentCache={}, rascunho={}, filtro="", podeEscrever=true, souDono=false, jaDisparei=false, primeiraLeitura=true, ultimoDisparo=0;
 const TAREFA="trig_01L5GPAgwVpikyaux9uzNs2o";
 const AVISO_ESPERA="Pedido registado. Arranca assim que o JD abrir o Studio YNG; recebe um email quando estiver pronto.";
 async function disparar(){
   if(!souDono) return false;
   try{ if(!mcp) mcp=await claude.use("mcp"); if(!mcp) return false;
-    await mcp.callTool("Claude Code Remote","fire_trigger",{trigger_id:TAREFA}); jaDisparei=true; return true }
-  catch(e){ return false }
+    const agora=Date.now(); if(agora-ultimoDisparo<20000) return true; /* um disparo de cada vez: evita execuções em duplicado */
+    ultimoDisparo=agora; jaDisparei=true;
+    await mcp.callTool("Claude Code Remote","fire_trigger",{trigger_id:TAREFA}); return true }
+  catch(e){ ultimoDisparo=0; return false }
 }
 
 const slug=s=>s.normalize("NFKD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,50)||"apresentacao";
@@ -178,23 +186,23 @@ function render(){
   L.replaceChildren(...vis.map(r=>{
     const go=el("div",{class:"go"});
     if(r.excel_url) go.append(el("a",{class:"btn sm",href:r.excel_url,target:"_blank",rel:"noopener"},"Ficha do Deck"));
-    if(["pronta","draft","publicada","erro"].includes(r.estado)&&podeEscrever)
-      go.append(el("button",{class:"btn sm"+(r.estado==="pronta"?" primary":""),type:"button","data-acao":"gerar_draft","data-id":r.id},r.draft_link?"Gerar novo draft":"Gerar draft"));
     if(r.draft_link) go.append(el("a",{class:"btn sm",href:r.draft_link,target:"_blank",rel:"noopener"},"Ver draft"));
-    if(r.estado==="draft"&&podeEscrever)
-      go.append(el("button",{class:"btn sm primary",type:"button","data-acao":"publicar","data-id":r.id},r.link?"Publicar alterações":"Publicar"));
     if(r.draft_link&&["draft","publicada","erro"].includes(r.estado)&&podeEscrever)
       go.append(el("button",{class:"btn sm",type:"button","data-coment":r.id,"aria-expanded":String(aberto===r.id)},r.coment_novos?"Comentar draft ("+r.coment_novos+")":"Comentar draft"));
-    if(r.link) go.append(el("a",{class:"btn sm",href:r.link,target:"_blank",rel:"noopener"},"Ver apresentação"));
+    if(["pronta","draft","publicada","erro"].includes(r.estado)&&podeEscrever)
+      go.append(el("button",{class:"btn sm"+(r.estado==="pronta"?" primary":""),type:"button","data-acao":"gerar_draft","data-id":r.id},r.draft_link?"Gerar novo draft":"Gerar draft"));
+    if(r.estado==="draft"&&podeEscrever)
+      go.append(el("button",{class:"btn sm primary",type:"button","data-acao":"publicar","data-id":r.id},r.link?"Publicar alterações":"Publicar"));
+    if(r.link) go.append(el("a",{class:"btn sm",href:r.link,target:"_blank",rel:"noopener"},"Deck publicado"));
     const det=el("div",{class:"det"});
-    if(r.estado==="publicada"&&r.publicado_em) det.append(el("span",{text:"Publicada em "+quando(r.publicado_em)}));
+    if(r.estado==="publicada"){ if(r.publicado_em) det.append(el("span",{text:"Publicada "+new Date(r.publicado_em).toLocaleDateString("pt-PT")})) }
     else if(r.estado==="publicar") det.append(el("span",{text:"Pedida em "+quando(r.pedido_publicar_em)+". "+(r.aviso||"A publicar dentro de minutos.")}));
     else if(r.estado==="pedido") det.append(el("span",{text:"Pedido em "+quando(r.criado_em)+". "+(r.aviso||"A ficha aparece dentro de minutos.")}));
     else if(r.estado==="pronta") det.append(el("span",{text:"Preencher a ficha e carregar em Gerar draft."}));
     else if(r.estado==="gerar_draft") det.append(el("span",{text:"Pedido em "+quando(r.pedido_draft_em)+". "+(r.aviso||"O draft fica pronto dentro de minutos.")}));
     else if(r.estado==="a_gerar_draft") det.append(el("span",{text:"A gerar o draft."}));
-    else if(r.estado==="draft") det.append(el("span",{text:"Draft de "+quando(r.draft_em)+". Ver, aprovar e publicar. Senha interna no email."}));
-    if(r.pasta) det.append(el("small",{text:r.pasta}));
+    else if(r.estado==="draft"){ if(r.draft_em) det.append(el("span",{text:"Última atualização draft "+new Date(r.draft_em).toLocaleDateString("pt-PT")})) }
+    if(r.pasta&&!["publicada","draft"].includes(r.estado)) det.append(el("small",{text:r.pasta}));
     const row=el("div",{class:"row"},
       el("div",{},el("h3",{text:r.nome}),el("div",{class:"meta",text:[r.cliente,r.marca,r.formato,r.idiomas].filter(Boolean).join(" · ")})),
       det, el("span",{class:"pill p-"+(r.estado||"pedido"),text:ESTADOS[r.estado]||r.estado}), go);
@@ -204,33 +212,65 @@ function render(){
   }));
 }
 
+function seccoesDe(r){
+  const l=(r.seccoes&&r.seccoes.length)?r.seccoes:Array.from({length:12},(_,i)=>({n:i+1,menu:"",bloco:""}));
+  return [{n:0,nome:"Geral (todo o deck)"},...l.map(x=>({n:x.n,nome:x.n+". "+(x.menu||x.bloco||"Secção "+x.n)}))];
+}
 function caixaComent(r){
-  const lista=el("ul",{class:"clist"});
-  (comentCache[r.id]||[]).forEach(c=>lista.append(el("li",{class:c.estado==="aplicado"?"ok":""},
-    el("b",{text:(c.por||"")+" · "+quando(c.em)+(c.estado==="aplicado"?" · aplicado":" · por aplicar")}),el("span",{text:c.texto}))));
-  const ta=el("textarea",{rows:"3",maxlength:"1500",placeholder:"Diga a secção e o que mudar. Ex.: Chiquita: pôr o vídeo em primeiro. Números: menos texto por baixo."});
+  const secs=seccoesDe(r), nomeSec=n=>(secs.find(x=>String(x.n)===String(n))||{nome:"Geral (todo o deck)"}).nome;
+  const box=el("div",{class:"coment"});
+  box.append(el("p",{text:"Um comentário por tema: escolha a secção e escreva o que mudar. Pode juntar vários antes de guardar. Entram no próximo draft e ficam registados na Ficha do Deck, no campo \"Como deve ficar\" de cada secção."}));
+  // comentários já feitos, agrupados por secção
+  const feitos=comentCache[r.id]||[];
+  if(feitos.length){
+    const grupos={}; feitos.forEach(c=>{ const k=c.secao!=null?String(c.secao):"0"; (grupos[k]=grupos[k]||[]).push(c) });
+    const wrap=el("div",{class:"cgrupos"});
+    Object.keys(grupos).sort((x,y)=>+x-+y).forEach(k=>{
+      const ul=el("ul",{class:"clist"});
+      grupos[k].forEach(c=>ul.append(el("li",{class:c.estado==="aplicado"?"ok":""},
+        el("b",{text:(c.por||"")+" · "+quando(c.em)+(c.estado==="aplicado"?" · aplicado":" · por aplicar")}),el("span",{text:c.texto}))));
+      wrap.append(el("div",{class:"cgrupo"},el("h4",{text:nomeSec(k)}),ul));
+    });
+    box.append(wrap);
+  }
+  // novos comentários (rascunho guardado em memória para não se perder quando a lista atualiza)
+  const rasc=rascunho[r.id]=rascunho[r.id]||[{secao:"",texto:""}];
+  const linhas=el("div",{class:"cnovos"});
+  const desenhar=()=>{ linhas.replaceChildren(...rasc.map((c,i)=>{
+    const sel=el("select",{"aria-label":"Secção"},el("option",{value:""},"Secção..."),...secs.map(x=>{ const o=el("option",{value:String(x.n)},x.nome); if(String(c.secao)===String(x.n)) o.selected=true; return o }));
+    sel.onchange=()=>{ c.secao=sel.value };
+    const ta=el("textarea",{rows:"3",placeholder:"O que mudar nesta secção. Ex.: pôr o vídeo em primeiro e cortar o texto para metade."}); ta.value=c.texto;
+    ta.oninput=()=>{ c.texto=ta.value };
+    const x=el("button",{class:"btn sm",type:"button","aria-label":"Tirar este comentário"},"Tirar");
+    x.onclick=()=>{ rasc.splice(i,1); if(!rasc.length) rasc.push({secao:"",texto:""}); desenhar() };
+    return el("div",{class:"cnovo"},sel,ta,rasc.length>1||c.texto?x:"");
+  })) };
+  desenhar();
+  const mais=el("button",{class:"btn sm",type:"button"},"+ Outro comentário");
+  mais.onclick=()=>{ rasc.push({secao:"",texto:""}); desenhar(); const t=linhas.querySelectorAll("select"); t[t.length-1].focus() };
   const msg=el("span",{class:"msg",role:"alert"});
-  const b1=el("button",{class:"btn sm",type:"button"},"Guardar comentário");
+  const b1=el("button",{class:"btn sm",type:"button"},"Guardar comentários");
   const b2=el("button",{class:"btn sm primary",type:"button"},"Guardar e gerar draft novo");
   const enviar=async gerar=>{
-    const texto=ta.value.trim(); if(!texto&&!gerar){ msg.textContent="Escreva o comentário."; return }
+    const prontos=rasc.filter(c=>c.texto.trim());
+    if(prontos.some(c=>c.secao==="")){ msg.textContent="Escolha a secção de cada comentário."; return }
+    if(!prontos.length&&!gerar){ msg.textContent="Escreva pelo menos um comentário."; return }
     b1.disabled=b2.disabled=true; msg.textContent="";
     const agora=new Date().toISOString();
     try{
       const ref=db.collection("apresentacoes").doc(r.id);
-      if(texto){ let por=""; try{ por=(user&&await user.name())||"" }catch(e){}
-        await ref.collection("comentarios").add({texto,por,em:agora,estado:"novo"});
-        await ref.update({coment_novos:(r.coment_novos||0)+1,atualizado_em:agora}) }
-      ta.value=""; await carregarComent(r.id);
+      if(prontos.length){ let por=""; try{ por=(user&&await user.name())||"" }catch(e){}
+        for(const c of prontos) await ref.collection("comentarios").add({texto:c.texto.trim(),secao:+c.secao,secao_nome:nomeSec(c.secao),por,em:agora,estado:"novo"});
+        await ref.update({coment_novos:(r.coment_novos||0)+prontos.length,atualizado_em:agora}) }
+      rascunho[r.id]=[{secao:"",texto:""}]; await carregarComent(r.id);
       if(gerar){ await ref.update({estado:"gerar_draft",pedido_draft_em:agora,atualizado_em:agora,mensagem:""}); aberto=null; render();
         nota(await disparar()?"A gerar o draft novo com os comentários. O link chega por email dentro de minutos.":AVISO_ESPERA) }
-      else { nota("Comentário guardado. Entra no próximo draft."); render() }
+      else { nota(prontos.length===1?"Comentário guardado. Entra no próximo draft.":prontos.length+" comentários guardados. Entram no próximo draft."); render() }
     }catch(err){ msg.textContent=err&&err.code==="invalid_argument"?"Não tem permissão. Peça acesso de Contributor ao JD.":"Não foi possível guardar. Tente de novo."; b1.disabled=b2.disabled=false }
   };
   b1.onclick=()=>enviar(false); b2.onclick=()=>enviar(true);
-  return el("div",{class:"coment"},
-    el("p",{text:"Os comentários entram no próximo draft: o sistema aplica-os às secções indicadas e regista-os na Ficha do Deck, no campo \"Como deve ficar\"."}),
-    lista.children.length?lista:"", ta, el("div",{class:"actions"},b1,b2,msg));
+  box.append(linhas, el("div",{class:"actions"},mais,b1,b2,msg));
+  return box;
 }
 async function carregarComent(id){
   try{ const q=await db.collection("apresentacoes").doc(id).collection("comentarios").get();
@@ -282,7 +322,9 @@ $("#form").addEventListener("submit",async e=>{
   if(!db){ nota("Esta vista não consegue ler as apresentações. Abra a página no Claude com a sua conta YoungNetwork."); return }
   db.collection("apresentacoes").onSnapshot(s=>{
     rows=s.docs.map(d=>({id:d.id,...d.data()})); nota(podeEscrever?"":"Pode ver as apresentações, mas não criar nem publicar. Peça acesso de Contributor ao JD."); render();
-    if(souDono&&!jaDisparei&&!s.metadata.fromCache&&rows.some(r=>PENDENTES.includes(r.estado))){ jaDisparei=true; disparar().then(ok=>{ if(ok) nota("Havia pedidos em espera: já arrancaram.") }) }
+    if(s.metadata.fromCache) return;
+    const inicio=primeiraLeitura; primeiraLeitura=false; /* só ao abrir a página: pedidos de colegas que ficaram à espera */
+    if(inicio&&souDono&&!jaDisparei&&rows.some(r=>PENDENTES.includes(r.estado))){ disparar().then(ok=>{ if(ok) nota("Havia pedidos em espera: já arrancaram.") }) }
   },err=>nota(err&&err.code==="revoked"?"O acesso a esta página mudou. Recarregue.":"Perdi a ligação às apresentações. Recarregue a página.","err"));
 })();
 </script>
