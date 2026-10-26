@@ -106,10 +106,118 @@ input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-ra
   .row .go{grid-column:1/-1;justify-content:flex-start}
   #q{max-width:none;flex:1 1 100%}
 }
+
+/* ===== Editor da Ficha do Deck: barra fixa em cima, índice de secções à esquerda, cartões à direita ===== */
+#ed{padding-block:0 64px}
+.ed-top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding-block:14px;border-bottom:2px solid var(--ink)}
+.ed-top .back{font-size:13px;color:var(--soft);text-decoration:none;font-weight:600}
+.ed-top .back:hover{color:var(--ink)}
+.ed-top h1{margin:0;font-family:var(--disp);font-stretch:85%;font-weight:800;font-size:24px;line-height:1.1;text-transform:uppercase;letter-spacing:-.01em;min-width:0;overflow-wrap:anywhere}
+.ed-top .grow{flex:1 1 auto}
+.ed-save{font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ed-save[data-k="err"]{color:var(--err)}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--surface)}
+.lang button{border:0;background:transparent;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;color:var(--soft)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.peers{display:flex;gap:4px;align-items:center}
+.peer{font-size:11px;font-weight:700;border-radius:999px;padding:3px 8px;background:var(--info-bg);color:var(--info);white-space:nowrap}
+.peer.me{background:var(--idle-bg);color:var(--soft)}
+
+.ed-body{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px;align-items:start}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 86px);display:grid;gap:4px}
+.toc b{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0 0 4px}
+.toc a{display:grid;grid-template-columns:22px minmax(0,1fr);gap:6px;align-items:baseline;text-decoration:none;padding:6px 8px;border-radius:8px;font-size:13px;color:var(--soft);cursor:grab}
+.toc a:hover{background:var(--surface);color:var(--ink)}
+.toc a.off{opacity:.45}
+.toc a.drop{outline:2px dashed var(--brand)}
+.toc a i{font-style:normal;font-variant-numeric:tabular-nums;color:var(--mute);font-size:12px}
+.toc a span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc .btn{margin-top:8px;justify-content:center}
+
+.cards{display:grid;gap:14px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);min-width:0}
+.card.off{opacity:.6}
+.card-h{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:9px 12px;cursor:pointer}
+.card-h .num{font-family:var(--disp);font-stretch:85%;font-weight:800;font-size:20px;font-variant-numeric:tabular-nums;width:28px;text-align:right;color:var(--mute)}
+.card-h .tt{min-width:0}
+.card-h .tt b{display:block;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-h .tt small{display:block;font-size:12px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-h .tools{display:flex;gap:4px;align-items:center}
+.ib{border:1px solid var(--line);background:var(--surface);border-radius:8px;width:30px;height:30px;display:inline-grid;place-items:center;cursor:pointer;font-size:14px;line-height:1;color:var(--soft)}
+.ib:hover{border-color:var(--ink);color:var(--ink)}
+.ib[disabled]{opacity:.35;cursor:default}
+.chip{font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.chip.blk{background:var(--idle-bg);color:var(--soft)}
+.chip.wr{background:var(--warn-bg);color:var(--warn)}
+.chip.who{background:var(--info-bg);color:var(--info)}
+.card-b{border-top:1px solid var(--line);padding:16px 14px 18px;display:grid;gap:16px}
+
+.blkrow{display:grid;grid-template-columns:120px minmax(0,1fr) auto;gap:14px;align-items:center}
+.blkrow svg{width:120px;height:72px;display:block;border-radius:8px;background:var(--bg)}
+.blkrow p{margin:0;font-size:13px;color:var(--soft)}
+.blkrow p b{display:block;color:var(--ink);font-size:14px}
+
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:12px;align-items:start}
+.row2 .f.wide{grid-column:1/-1}
+.f{display:grid;gap:4px;min-width:0}
+.f>span{font-size:12px;font-weight:700;color:var(--soft);display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.f>span em{font-style:normal;font-weight:400;color:var(--mute)}
+.f input[type=text],.f input[type=email],.f input:not([type]),.f textarea,.f select{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:14px}
+.f textarea{resize:vertical;min-height:64px;line-height:1.45}
+.f .pt{font-size:12px;color:var(--mute);border-left:2px solid var(--line);padding-left:8px;white-space:pre-wrap;overflow-wrap:anywhere}
+.f.ideias textarea{background:var(--warn-bg);border-color:transparent;min-height:84px}
+.tog{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--soft);cursor:pointer}
+.tog input{width:18px;height:18px;accent-color:var(--brand)}
+
+.write{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.write .note2{font-size:12px;color:var(--mute)}
+
+.media{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center}
+.media .thumb{width:72px;height:48px;border-radius:8px;background:var(--bg) center/cover no-repeat;border:1px dashed var(--line);display:grid;place-items:center;font-size:10px;color:var(--mute);overflow:hidden}
+.media .ctl{display:flex;gap:6px;min-width:0}
+.media .ctl input{flex:1 1 auto;min-width:0}
+.media.over .thumb{border-color:var(--brand);background-color:var(--warn-bg)}
+
+.items{display:grid;gap:8px}
+.items>b{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.it{border:1px solid var(--line);border-radius:12px;padding:10px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;background:var(--bg)}
+.it.off{opacity:.55}
+.it .flds{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(190px,100%),1fr));grid-auto-flow:row dense;gap:8px;align-items:start}
+.it .flds .f input,.it .flds .f textarea,.it .flds .f select{background:var(--surface)}
+.it .flds .f.wide{grid-column:1/-1}
+.it .ictl{display:flex;flex-direction:column;gap:4px}
+
+.cfg .card-b{border-top:0;padding-top:4px}
+
+/* galeria de blocos */
+dialog.gal{border:0;border-radius:18px;padding:0;max-width:min(980px,calc(100vw - 32px));width:100%;background:var(--surface);color:var(--ink)}
+dialog.gal::backdrop{background:rgba(0,0,0,.45)}
+.gal-h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.gal-h h2{margin:0;font-family:var(--disp);font-stretch:85%;font-size:22px}
+.gal-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:16px 18px 20px;max-height:70vh;overflow:auto}
+.gal-g button{display:grid;gap:8px;text-align:left;border:1px solid var(--line);border-radius:14px;padding:10px;background:var(--bg);cursor:pointer;color:inherit;font:inherit}
+.gal-g button:hover,.gal-g button[aria-current="true"]{border-color:var(--brand)}
+.gal-g svg{width:100%;height:auto;aspect-ratio:5/3;display:block;border-radius:8px;background:var(--surface)}
+.gal-g b{font-size:14px}
+.gal-g small{font-size:12px;color:var(--mute);line-height:1.35}
+
+.sk{--k:var(--ink);--a:var(--brand);--m:var(--line)}
+
+@media (max-width:860px){
+  .ed-body{grid-template-columns:1fr}
+  .toc{position:static;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .toc b{grid-column:1/-1}
+  .blkrow{grid-template-columns:1fr}
+}
+.sk .k{fill:var(--ink)} .sk .a{fill:var(--brand)} .sk .m{fill:var(--line)} .sk .s{fill:var(--mute)}
+.sk .o{fill:none;stroke:var(--mute);stroke-width:1.2;stroke-dasharray:3 2}
+.sk .w{fill:var(--surface)}
+
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
 <div class="wrap">
+<div id="home">
   <header>
     <div class="mark"><b>Studio <span>YNG</span></b><small>Decks YoungNetwork Group</small></div>
     <button class="btn primary" id="bNova" type="button">+ Nova apresentação</button>
@@ -149,6 +257,8 @@ input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-ra
     <div><b>4. Publicar</b><p>Com o draft aprovado: sai o link final para o consultor, para apresentar ou enviar ao cliente por email.</p></div>
   </section>
 </div>
+<div id="ed" hidden></div>
+</div>
 
 <script>
 const $=s=>document.querySelector(s);
@@ -185,7 +295,8 @@ function render(){
   if(!vis.length){ L.replaceChildren(el("div",{class:"empty"},el("b",{text:"Nada encontrado."}),"Mude o filtro ou a pesquisa.")); return }
   L.replaceChildren(...vis.map(r=>{
     const go=el("div",{class:"go"});
-    if(r.excel_url) go.append(el("a",{class:"btn sm",href:r.excel_url,target:"_blank",rel:"noopener"},"Ficha do Deck"));
+    if(r.ficha_v) go.append(el("a",{class:"btn sm",href:"#ficha-"+r.id},"Ficha do Deck"));
+    else if(r.excel_url) go.append(el("a",{class:"btn sm",href:r.excel_url,target:"_blank",rel:"noopener"},"Ficha do Deck"));
     if(r.draft_link) go.append(el("a",{class:"btn sm",href:r.draft_link,target:"_blank",rel:"noopener"},"Ver draft"));
     if(r.draft_link&&["draft","publicada","erro"].includes(r.estado)&&podeEscrever)
       go.append(el("button",{class:"btn sm",type:"button","data-coment":r.id,"aria-expanded":String(aberto===r.id)},r.coment_novos?"Comentar draft ("+r.coment_novos+")":"Comentar draft"));
@@ -201,7 +312,7 @@ function render(){
     else if(r.estado==="pronta") det.append(el("span",{text:"Preencher a ficha e carregar em Gerar draft."}));
     else if(r.estado==="gerar_draft") det.append(el("span",{text:"Pedido em "+quando(r.pedido_draft_em)+". "+(r.aviso||"O draft fica pronto dentro de minutos.")}));
     else if(r.estado==="a_gerar_draft") det.append(el("span",{text:"A gerar o draft."}));
-    else if(r.estado==="draft"){ if(r.draft_em) det.append(el("span",{text:"Última atualização draft "+new Date(r.draft_em).toLocaleDateString("pt-PT")})) }
+    else if(r.estado==="draft"){ if(r.draft_em) det.append(el("span",{text:"Última atualização draft "+new Date(r.draft_em).toLocaleDateString("pt-PT")+", "+new Date(r.draft_em).toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"})})) }
     if(r.pasta&&!["publicada","draft"].includes(r.estado)) det.append(el("small",{text:r.pasta}));
     const row=el("div",{class:"row"},
       el("div",{},el("h3",{text:r.nome}),el("div",{class:"meta",text:[r.cliente,r.marca,r.formato,r.idiomas].filter(Boolean).join(" · ")})),
@@ -283,14 +394,18 @@ $("#list").addEventListener("click",async e=>{
   const cb=e.target.closest("[data-coment]");
   if(cb&&db){ const id=cb.dataset.coment; if(aberto===id){ aberto=null; render(); return } aberto=id; await carregarComent(id); render();
     const t=document.querySelector(".coment textarea"); if(t) t.focus(); return }
-  const b=e.target.closest("[data-acao]"); if(!b||!db) return;
+  const b=e.target.closest("[data-acao]"); if(b&&db) pedirAcao(b);
+});
+
+async function pedirAcao(b){
   const acao=b.dataset.acao, txt=b.textContent, agora=new Date().toISOString();
   b.disabled=true; b.textContent="A pedir...";
   const campos=acao==="gerar_draft"?{estado:"gerar_draft",pedido_draft_em:agora}:{estado:"publicar",pedido_publicar_em:agora};
   try{ await db.collection("apresentacoes").doc(b.dataset.id).update({...campos,atualizado_em:agora,mensagem:""});
     nota(await disparar()?(acao==="gerar_draft"?"A gerar o draft. O link chega por email dentro de minutos.":"A publicar. O link do cliente chega por email dentro de minutos."):AVISO_ESPERA) }
   catch(err){ b.disabled=false; b.textContent=txt; nota(err&&err.code==="invalid_argument"?"Não tem permissão nesta página. Peça acesso de Contributor ao JD.":"Não foi possível fazer o pedido. Tente de novo.","err") }
-});
+}
+$("#ed").addEventListener("click",e=>{ const b=e.target.closest("[data-acao]"); if(b&&db) pedirAcao(b) });
 
 $("#bNova").onclick=()=>{ $("#form").hidden=false; $("#fNome").focus() };
 $("#bCancelar").onclick=()=>{ $("#form").hidden=true; $("#fMsg").textContent="" };
@@ -320,11 +435,418 @@ $("#form").addEventListener("submit",async e=>{
   souDono=!!(user&&await user.isOwner());
   if(user){ try{ const m=await user.email(); if(m) $("#fEmail").value=m }catch(e){} const w=await user.can("data.write"); if(w===false){ podeEscrever=false; $("#bNova").hidden=true } }
   if(!db){ nota("Esta vista não consegue ler as apresentações. Abra a página no Claude com a sua conta YoungNetwork."); return }
+  rota();
   db.collection("apresentacoes").onSnapshot(s=>{
-    rows=s.docs.map(d=>({id:d.id,...d.data()})); nota(podeEscrever?"":"Pode ver as apresentações, mas não criar nem publicar. Peça acesso de Contributor ao JD."); render();
+    rows=s.docs.map(d=>({id:d.id,...d.data()})); if(ED&&ED.cfgDoc){ const t=document.querySelector(".ed-top"); if(t) t.replaceWith(topo()) } nota(podeEscrever?"":"Pode ver as apresentações, mas não criar nem publicar. Peça acesso de Contributor ao JD."); render();
     if(s.metadata.fromCache) return;
     const inicio=primeiraLeitura; primeiraLeitura=false; /* só ao abrir a página: pedidos de colegas que ficaram à espera */
     if(inicio&&souDono&&!jaDisparei&&rows.some(r=>PENDENTES.includes(r.estado))){ disparar().then(ok=>{ if(ok) nota("Havia pedidos em espera: já arrancaram.") }) }
   },err=>nota(err&&err.code==="revoked"?"O acesso a esta página mudou. Recarregue.":"Perdi a ligação às apresentações. Recarregue a página.","err"));
 })();
+
+/* ================= Editor da Ficha do Deck ================= */
+const BL={"Capa": {"tipo": "abertura", "desc": "Primeiro ecrã: logótipos, título grande e vídeo ou imagem de fundo.", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "media", "l": "Ficheiro ou link", "t": false, "a": "Vídeo ou imagem de fundo: nome do ficheiro na pasta Media ou link (YouTube, Vimeo, OneDrive)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": []}, "Frase de impacto": {"tipo": "hero", "desc": "Uma frase grande, sozinha, por cima de um vídeo ou imagem.", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "media", "l": "Ficheiro ou link", "t": false, "a": "Vídeo ou imagem de fundo: nome do ficheiro na pasta Media ou link (YouTube, Vimeo, OneDrive)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": []}, "Texto e imagem": {"tipo": "texto", "desc": "Título e texto, com uma imagem ou vídeo ao lado (opcional).", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "media", "l": "Ficheiro ou link", "t": false, "a": "Imagem ou vídeo ao lado do texto (opcional)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": []}, "Números": {"tipo": "numeros", "desc": "Números grandes em destaque (resultados, alcance, anos).", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": [{"k": "value", "l": "Número", "t": false, "a": "Ex.: 68.268 ou 245,7K ou +139%", "ex": "68.268"}, {"k": "title", "l": "O que mede", "t": true, "a": "Ex.: pico de espectadores", "ex": "pico de espectadores"}, {"k": "text", "l": "Nota", "t": true, "a": "Opcional", "ex": ""}]}, "Vídeos e trabalhos": {"tipo": "cases", "desc": "Grelha de trabalhos; ao clicar, o vídeo abre em grande.", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": [{"k": "media", "l": "Ficheiro ou link", "t": false, "a": "Vídeo ou imagem do trabalho: ficheiro na Media ou link", "ex": "case-galp.mp4"}, {"k": "poster", "l": "Imagem de capa", "t": false, "a": "Opcional: imagem a mostrar antes de o vídeo tocar", "ex": ""}, {"k": "sub", "l": "Cliente ou categoria", "t": true, "a": "Linha pequena por cima do título", "ex": "Galp"}, {"k": "title", "l": "Título", "t": true, "a": "Nome do trabalho", "ex": "Campanha de verão"}, {"k": "text", "l": "Descrição", "t": true, "a": "Opcional", "ex": ""}]}, "Equipa": {"tipo": "equipa", "desc": "Fotografias com nome e função.", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": [{"k": "media", "l": "Fotografia", "t": false, "a": "Ficheiro na Media ou link", "ex": "ana.jpg"}, {"k": "title", "l": "Nome", "t": false, "a": "", "ex": "Ana Silva"}, {"k": "sub", "l": "Função", "t": true, "a": "", "ex": "Diretora criativa"}, {"k": "text", "l": "Nota", "t": true, "a": "Opcional", "ex": ""}]}, "Lista": {"tipo": "lista", "desc": "Blocos numerados: serviços, formatos, fases, passos.", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": [{"k": "title", "l": "Título", "t": true, "a": "", "ex": "Estratégia"}, {"k": "sub", "l": "Subtítulo", "t": true, "a": "Opcional", "ex": ""}, {"k": "text", "l": "Texto", "t": true, "a": "", "ex": "Plano de comunicação e calendário."}]}, "Logótipos": {"tipo": "logos", "desc": "Logótipos de clientes ou parceiros.", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": [{"k": "media", "l": "Ficheiro ou link", "t": false, "a": "Logótipo (PNG transparente ou SVG) na Media ou link", "ex": "galp.png"}, {"k": "title", "l": "Nome", "t": false, "a": "Aparece se faltar o logótipo", "ex": "Galp"}]}, "Contactos": {"tipo": "contacto", "desc": "Pessoas de contacto, com email e WhatsApp.", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": [{"k": "title", "l": "Nome", "t": false, "a": "", "ex": "JD"}, {"k": "sub", "l": "Função", "t": true, "a": "", "ex": "CEO · YoungNetwork Group"}, {"k": "email", "l": "Email", "t": false, "a": "", "ex": "nome@youngnetworkgroup.com"}, {"k": "phone", "l": "Telefone", "t": false, "a": "Com indicativo (ex.: +351 912 345 678)", "ex": ""}, {"k": "link", "l": "Link", "t": false, "a": "Opcional", "ex": ""}]}, "Vídeo grande": {"tipo": "video", "desc": "Um vídeo em ecrã inteiro. No reel, avança quando o vídeo acaba.", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "media", "l": "Ficheiro ou link", "t": false, "a": "O vídeo: ficheiro na Media ou link (YouTube, Vimeo, OneDrive)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": []}, "Cartões com filtro": {"tipo": "cartoes", "desc": "Cartões com botões de filtro em cima (ex.: entregas por momento).", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": [{"k": "tag", "l": "Filtro", "t": true, "a": "Os cartões com o mesmo filtro ficam juntos", "ex": "Semana 1"}, {"k": "sub", "l": "Categoria", "t": true, "a": "Etiqueta pequena", "ex": "Social"}, {"k": "title", "l": "Título", "t": true, "a": "", "ex": "Peças para redes"}, {"k": "text", "l": "Texto", "t": true, "a": "", "ex": "Posts e stories."}, {"k": "value", "l": "Número", "t": false, "a": "Opcional: número em destaque", "ex": "12"}, {"k": "goal", "l": "Unidade", "t": true, "a": "Opcional: ao lado do número (ex.: por mês)", "ex": "por mês"}]}, "Calendário": {"tipo": "calendario", "desc": "Dias ou fases de um evento ou projeto.", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": [{"k": "value", "l": "Dia ou data", "t": false, "a": "Aparece em grande (ex.: 24 ou S1)", "ex": "24"}, {"k": "sub", "l": "Dia da semana", "t": true, "a": "Opcional (ex.: SÁB · OUT)", "ex": "SÁB · OUT"}, {"k": "title", "l": "O que acontece", "t": true, "a": "", "ex": "Ronda 1"}, {"k": "text", "l": "Descrição", "t": true, "a": "Opcional", "ex": ""}, {"k": "tag", "l": "Fase", "t": true, "a": "Opcional: dias da mesma fase ficam com a mesma cor", "ex": "Fase de grupos"}]}, "Tarefas": {"tipo": "tarefas", "desc": "Quem faz o quê e até quando.", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": [{"k": "value", "l": "Quando", "t": false, "a": "", "ex": "até 31/10"}, {"k": "sub", "l": "Quem", "t": true, "a": "", "ex": "YoungNetwork"}, {"k": "text", "l": "O quê", "t": true, "a": "", "ex": "Contrato assinado."}]}, "Progresso": {"tipo": "barras", "desc": "Barras de progresso: valor atual contra uma meta.", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": [{"k": "title", "l": "Indicador", "t": true, "a": "", "ex": "Stories"}, {"k": "value", "l": "Valor atual", "t": false, "a": "Número", "ex": "34"}, {"k": "goal", "l": "Meta", "t": false, "a": "Número", "ex": "48"}, {"k": "text", "l": "Nota", "t": true, "a": "Opcional", "ex": ""}]}, "Perguntas": {"tipo": "perguntas", "desc": "Cartões que viram ao tocar: pergunta à frente, resposta atrás.", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": [{"k": "title", "l": "Pergunta", "t": true, "a": "", "ex": "Como foi o jogo?"}, {"k": "sub", "l": "Pista", "t": true, "a": "Opcional, por baixo da pergunta", "ex": ""}, {"k": "text", "l": "Resposta", "t": true, "a": "Aparece ao virar", "ex": ""}]}, "Checklist": {"tipo": "checklist", "desc": "Listas para ir marcando (ficam gravadas no telemóvel de quem usa).", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": [{"k": "title", "l": "Grupo", "t": true, "a": "Nome do grupo de tarefas", "ex": "Antes do jogo"}, {"k": "tag", "l": "Etiqueta", "t": true, "a": "Opcional", "ex": ""}, {"k": "text", "l": "Itens a marcar", "t": true, "a": "Um por linha (Alt+Enter para mudar de linha)", "ex": "Montar câmara\nTestar som"}]}, "Princípios": {"tipo": "regras", "desc": "Regras, princípios ou compromissos, em cartões.", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": [{"k": "title", "l": "Título", "t": true, "a": "", "ex": "Resultado só depois do jogo"}, {"k": "text", "l": "Texto", "t": true, "a": "", "ex": ""}]}, "Galeria": {"tipo": "galeria", "desc": "Imagens e vídeos em mosaico; abrem em grande ao clicar.", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "Opcional: o que quer neste bloco (ex.: 'vídeo à esquerda, números à direita')."}], "tab": [{"k": "media", "l": "Ficheiro ou link", "t": false, "a": "Ficheiro na Media ou link", "ex": "foto1.jpg"}, {"k": "title", "l": "Legenda", "t": true, "a": "Opcional", "ex": ""}]}, "Bloco livre": {"tipo": "livre", "desc": "Quando nenhum bloco serve: descreva em 'Como deve ficar' e é desenhado à medida.", "cab": [{"k": "kicker", "l": "Pequeno título", "t": true, "a": "Linha curta por cima do título (ex.: PROPOSTA 2027)."}, {"k": "title", "l": "Título", "t": true, "a": "Título da secção."}, {"k": "text", "l": "Texto", "t": true, "a": "Texto corrido (opcional)."}, {"k": "media", "l": "Ficheiro ou link", "t": false, "a": "Vídeo ou imagem de fundo: nome do ficheiro na pasta Media ou link (YouTube, Vimeo, OneDrive)."}, {"k": "pedido", "l": "Como deve ficar", "t": false, "a": "OBRIGATÓRIO: descreva o que quer ver (ex.: 'mapa com os 5 países e o número de eventos em cada')."}], "tab": [{"k": "title", "l": "Título", "t": true, "a": "", "ex": ""}, {"k": "text", "l": "Texto", "t": true, "a": "", "ex": ""}, {"k": "value", "l": "Número", "t": false, "a": "", "ex": ""}, {"k": "media", "l": "Ficheiro ou link", "t": false, "a": "", "ex": ""}, {"k": "link", "l": "Link", "t": false, "a": "", "ex": ""}]}}
+;
+const MARCAS=["YoungNetwork Group","YN Angola","YN Moçambique","YN Color","Taylor","Alice"];
+const TOM={"YoungNetwork Group":"Tom de voz YoungNetwork: ousado, criativo e confiante; frases curtas e impactantes; verbos no presente; direto, sem rodeios nem formalidade a mais; energia e atitude, sem exageros vazios. Assinatura: Leading Brave Brands."};
+let ED=null, assetsNS=null, sampleNS=null, roomNS=null;
+
+/* ---------- esquemas dos blocos (galeria) ---------- */
+function sk(tipo){
+  const R=(x,y,w,h,c,r)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r??1.5}" class="${c}"/>`;
+  const C=(x,y,r,c)=>`<circle cx="${x}" cy="${y}" r="${r}" class="${c}"/>`;
+  const P=(x,y,s,c)=>`<path d="M${x} ${y-s}L${x+s*1.6} ${y}L${x} ${y+s}Z" class="${c}"/>`;
+  const L=(x,y,w,n,g,c)=>Array.from({length:n},(_,i)=>R(x,y+i*g,i==n-1?w*.6:w,2.2,c||"m",1)).join("");
+  let g="";
+  switch(tipo){
+    case"abertura": g=R(0,0,100,60,"k",0)+R(8,8,14,4,"a")+R(8,26,62,8,"w")+R(8,38,40,8,"w")+R(8,50,24,4,"a",2); break;
+    case"hero": g=R(0,0,100,60,"s",0)+R(12,24,76,10,"w")+R(30,40,40,3,"w"); break;
+    case"texto": g=R(8,10,36,6,"k")+L(8,22,36,5,6)+R(54,8,38,44,"s",3); break;
+    case"numeros": g=[8,38,68].map(x=>R(x,14,24,14,"a")+R(x,32,20,2.5,"m",1)+R(x,37,14,2.5,"m",1)).join(""); break;
+    case"cases": g=[0,1,2].flatMap(c=>[0,1].map(r=>R(8+c*29,8+r*24,26,20,"s",2)+P(19+c*29,18+r*24,4,"w"))).join(""); break;
+    case"equipa": g=[0,1,2,3].map(i=>C(17+i*22,24,8,"s")+R(9+i*22,37,16,3,"k",1)+R(11+i*22,43,12,2.2,"m",1)).join(""); break;
+    case"lista": g=[0,1,2,3].map(i=>R(8,8+i*12,8,8,"a")+R(20,9+i*12,50,3,"k",1)+R(20,14+i*12,34,2,"m",1)).join(""); break;
+    case"logos": g=[0,1,2,3].flatMap(c=>[0,1,2].map(r=>R(8+c*22,8+r*16,18,10,"m",2))).join(""); break;
+    case"contacto": g=[0,1].map(i=>R(8+i*44,12,40,36,"m",3)+C(20+i*44,24,5,"s")+R(14+i*44,33,26,3,"k",1)+R(14+i*44,39,20,2,"a",1)).join(""); break;
+    case"video": g=R(0,0,100,60,"k",0)+C(50,30,10,"a")+P(47,30,5,"w"); break;
+    case"cartoes": g=[0,1,2].map(i=>R(8+i*18,6,15,5,i?"m":"a",2.5)).join("")+[0,1,2].map(i=>R(8+i*29,16,26,36,"m",3)+R(12+i*29,22,14,2.5,"a",1)+L(12+i*29,30,18,3,5)).join(""); break;
+    case"calendario": g=[0,1,2,3,4].map(i=>R(8+i*17.5,10,15,40,i==2?"a":"m",2)+R(11+i*17.5,14,9,6,i==2?"w":"k",1)).join(""); break;
+    case"tarefas": g=[0,1,2,3].map(i=>R(8,8+i*12,16,7,"a",2)+R(28,10+i*12,56,3,"k",1)).join(""); break;
+    case"barras": g=[0,1,2,3].map(i=>R(8,10+i*11,84,5,"m",2.5)+R(8,10+i*11,[70,52,80,34][i],5,"a",2.5)).join(""); break;
+    case"perguntas": g=[0,1,2].map(i=>R(8+i*29,10,26,40,i==1?"a":"m",3)+`<text x="${21+i*29}" y="35" text-anchor="middle" font-size="14" font-weight="800" class="${i==1?"w":"k"}">?</text>`).join(""); break;
+    case"checklist": g=[0,1,2,3].map(i=>R(8,8+i*12,8,8,i<2?"a":"m",2)+R(22,10+i*12,50,3,"k",1)).join(""); break;
+    case"regras": g=[0,1].flatMap(c=>[0,1].map(r=>R(8+c*43,8+r*23,40,20,"m",3)+R(13+c*43,13+r*23,22,3,"k",1)+R(13+c*43,19+r*23,28,2,"s",1))).join(""); break;
+    case"galeria": g=R(8,8,30,26,"s",2)+R(8,37,30,15,"m",2)+R(41,8,24,15,"m",2)+R(41,26,24,26,"s",2)+R(68,8,24,30,"s",2)+R(68,41,24,11,"m",2); break;
+    default: g=`<rect x="8" y="8" width="84" height="44" rx="4" class="o"/>`+R(30,26,40,3,"s",1)+R(38,32,24,2.2,"m",1);
+  }
+  return `<svg class="sk" viewBox="0 0 100 60" aria-hidden="true">${g}</svg>`;
+}
+
+/* ---------- utilidades ---------- */
+const clone=o=>JSON.parse(JSON.stringify(o??null));
+function merge(a,b){ if(b===null||typeof b!=="object"||Array.isArray(b)) return clone(b); const o=(a&&typeof a==="object"&&!Array.isArray(a))?{...a}:{}; for(const k in b) o[k]=merge(o[k],b[k]); return o }
+function nest(path,v){ const o={}; let c=o; path.forEach((k,i)=>{ if(i===path.length-1) c[k]=v; else c=c[k]={} }); return o }
+function at(o,path){ return path.reduce((c,k)=>c==null?undefined:c[k],o) }
+const hora=()=>new Date().toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"});
+const tr=v=>v&&typeof v==="object"?v:{pt:v||"",en:""};
+const nid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+
+/* ---------- dados: servidor + pendentes ---------- */
+function docRef(key){ return key==="cfg"?db.doc("fichas/"+ED.id):db.doc("fichas/"+ED.id+"/seccoes/"+key) }
+function view(key){
+  const base=key==="cfg"?ED.cfgDoc:ED.secs[key];
+  return merge(merge(base||{},ED.voo[key]||{}),ED.pend[key]||{});
+}
+function getv(key,path){ return at(view(key),path) }
+function setv(key,path,v,{now}={}){
+  ED.pend[key]=merge(ED.pend[key]||{},nest(path,v));
+  estadoGrav("A gravar...");
+  clearTimeout(ED.tmr[key]); ED.tmr[key]=setTimeout(()=>flush(key),now?0:650);
+}
+async function flush(key){
+  if(ED.voo[key]){ ED.again[key]=true; return }
+  const p=ED.pend[key]; if(!p) return;
+  ED.voo[key]=p; delete ED.pend[key];
+  try{ await docRef(key).update(p); estadoGrav("Gravado às "+hora()) }
+  catch(err){ ED.pend[key]=merge(p,ED.pend[key]||{}); estadoGrav(err&&err.code==="invalid_argument"?"Sem permissão para gravar. Peça acesso de Contributor ao JD.":"Não gravou. Volta a tentar sozinho.","err"); setTimeout(()=>flush(key),4000) }
+  finally{ delete ED.voo[key]; if(ED.again[key]){ ED.again[key]=false; flush(key) } }
+}
+function estadoGrav(t,k){ const e=$("#edSave"); if(e){ e.textContent=t; e.dataset.k=k||"" } }
+
+/* ---------- abrir e fechar ---------- */
+function rota(){ const h=decodeURIComponent(location.hash.slice(1)); if(h.startsWith("ficha-")&&db) abrirFicha(h.slice(6)); else fecharFicha() }
+addEventListener("hashchange",rota);
+function fecharFicha(){
+  if(!ED) { $("#home").hidden=false; $("#ed").hidden=true; return }
+  for(const k in ED.pend) flush(k);
+  ED.unsub.forEach(f=>{ try{f()}catch(e){} }); if(ED.room) ED.room.leave().catch(()=>{});
+  ED=null; $("#ed").hidden=true; $("#home").hidden=false; window.scrollTo(0,0);
+}
+async function abrirFicha(id){
+  if(ED&&ED.id===id) return;
+  if(ED) fecharFicha();
+  ED={id,cfgDoc:null,secs:{},pend:{},voo:{},again:{},tmr:{},unsub:[],aberta:null,lang:"pt",sig:"",peers:[],nomes:{},prev:{},carregado:{cfg:false,secs:false}};
+  $("#home").hidden=true; $("#ed").hidden=false; window.scrollTo(0,0);
+  $("#ed").replaceChildren(el("p",{class:"note",text:"A abrir a ficha..."}));
+  ED.unsub.push(db.doc("fichas/"+id).onSnapshot(s=>{ ED.cfgDoc=s.exists?s.data():null; ED.carregado.cfg=true; sincronizar() },()=>estadoGrav("Perdi a ligação. Recarregue a página.","err")));
+  ED.unsub.push(db.collection("fichas/"+id+"/seccoes").onSnapshot(q=>{ const o={}; q.docs.forEach(d=>o[d.id]=d.data()); ED.secs=o; ED.carregado.secs=true; sincronizar() },()=>{}));
+  if(!assetsNS) claude.use("assets").then(a=>{ assetsNS=a; if(ED&&ED.carregado.cfg&&ED.carregado.secs) desenhar() });
+  ligarSala(id);
+}
+async function ligarSala(id){
+  try{ if(!roomNS) roomNS=await claude.use("room"); if(!roomNS||!ED) return;
+    const r=await roomNS.join("ficha-"+id); if(!ED||ED.id!==id){ r.leave(); return }
+    ED.room=r; r.presence({secao:ED.aberta||null});
+    ED.unsub.push(r.onPeers(async ch=>{ if(!ED) return; ED.peers=ch.peers.filter(p=>p.kind==="viewer");
+      const ids=ED.peers.map(p=>p.by).filter(Boolean).filter(x=>!(x in ED.nomes));
+      if(ids.length&&user){ try{ const ps=await user.profiles(ids); for(const k in ps) ED.nomes[k]=ps[k].name||"" }catch(e){} }
+      desenharPeers() }));
+  }catch(e){}
+}
+function nomePeer(p){ return p.isMe?"Eu":(ED.nomes[p.by]||"Colega") }
+function desenharPeers(){
+  const box=$("#edPeers"); if(!box||!ED) return;
+  const outros=ED.peers.filter(p=>!p.isMe);
+  box.replaceChildren(...outros.map(p=>el("span",{class:"peer",title:p.presence&&p.presence.secao?"Na secção "+tituloSec(p.presence.secao):"",text:nomePeer(p)})));
+  document.querySelectorAll("[data-who]").forEach(n=>{ const sid=n.dataset.who; const q=outros.filter(p=>p.presence&&p.presence.secao===sid);
+    n.hidden=!q.length; n.textContent=q.map(nomePeer).join(", ") });
+}
+
+/* ---------- desenho ---------- */
+function ordem(){ const o=(getv("cfg",["ordem"])||[]).filter(s=>ED.secs[s]||ED.pend[s]); return o }
+function assinatura(){
+  const c=view("cfg");
+  return JSON.stringify([ED.lang,c.config&&c.config.formato,c.config&&c.config.com_senha,ordem(),ordem().map(s=>{ const v=view(s); return [v.bloco,v.incluir,v.escrever_no_draft,itensDe(v).map(i=>[i.id,i.incluir!==false])] }),!!assetsNS,ED.aberta,!!ED.cfgDoc])
+}
+function sincronizar(){
+  if(!ED||!ED.carregado.cfg||!ED.carregado.secs) return;
+  const s=assinatura(); if(s!==ED.sig){ desenhar(); return }
+  document.querySelectorAll("#ed [data-k][data-p]").forEach(n=>{
+    if(n===document.activeElement) return;
+    const v=getv(n.dataset.k,JSON.parse(n.dataset.p));
+    if(n.type==="checkbox") n.checked=!!v; else if((v??"")!==n.value) n.value=v??"";
+  });
+  document.querySelectorAll("#ed [data-ptref]").forEach(n=>{ n.textContent=getv(n.dataset.k,JSON.parse(n.dataset.ptref))||"(em branco em português)" });
+  document.querySelectorAll("#ed [data-sum]").forEach(n=>{ n.textContent=resumoSec(n.dataset.sum) });
+  desenharToc(); desenharPeers();
+}
+function itensDe(v){ return Object.entries(v.itens||{}).filter(([,i])=>i&&!i.apagado).map(([id,i])=>({id,...i})).sort((a,b)=>(a.o||0)-(b.o||0)) }
+function tituloSec(sid){ const v=view(sid); return (v.menu&&v.menu.pt)||(v.cab&&v.cab.title&&tr(v.cab.title).pt)||v.bloco||"Secção" }
+function resumoSec(sid){ const v=view(sid); const t=v.cab&&v.cab.title?tr(v.cab.title).pt:""; return [v.bloco,t].filter(Boolean).join(" · ") }
+
+function desenhar(soCabecalho){
+  if(!ED) return;
+  const foco=document.activeElement&&document.activeElement.id, sel=foco&&document.activeElement.selectionStart;
+  ED.sig=assinatura();
+  if(!ED.cfgDoc){ $("#ed").replaceChildren(topo(), el("div",{class:"empty"},el("b",{text:"Esta apresentação ainda não tem ficha no Studio."}),"A ficha deste deck ainda está no Excel. Use o botão \"Ficha do Deck\" na lista para a abrir.")); return }
+  const cards=el("div",{class:"cards"}, cartaoCfg(), ...ordem().map((sid,i)=>cartaoSec(sid,i)));
+  $("#ed").replaceChildren(topo(), el("div",{class:"ed-body"}, el("nav",{class:"toc",id:"edToc","aria-label":"Secções"}), cards));
+  desenharToc(); desenharPeers();
+  if(foco){ const n=document.getElementById(foco); if(n){ n.focus(); try{ if(sel!=null) n.setSelectionRange(sel,sel) }catch(e){} } }
+}
+function topo(){
+  const r=rows.find(x=>x.id===ED.id)||{};
+  const lang=el("div",{class:"lang",role:"group","aria-label":"Língua a editar"},
+    ...["pt","en"].map(l=>{ const b=el("button",{type:"button","aria-pressed":String(ED.lang===l)},l.toUpperCase()); b.onclick=()=>{ ED.lang=l; desenhar() }; return b }));
+  const go=el("div",{class:"go"});
+  if(r.draft_link) go.append(el("a",{class:"btn sm",href:r.draft_link,target:"_blank",rel:"noopener"},"Ver draft"));
+  if(["pronta","draft","publicada","erro"].includes(r.estado)&&podeEscrever) go.append(el("button",{class:"btn sm primary",type:"button","data-acao":"gerar_draft","data-id":ED.id},r.draft_link?"Gerar novo draft":"Gerar draft"));
+  else if(r.estado) go.append(el("span",{class:"pill p-"+r.estado,text:ESTADOS[r.estado]||r.estado}));
+  return el("div",{class:"ed-top"},
+    el("a",{class:"back",href:"#"},"← Apresentações"),
+    el("h1",{text:r.nome||ED.id}),
+    el("span",{class:"grow"}),
+    el("div",{class:"peers",id:"edPeers"}),
+    lang, el("span",{class:"ed-save",id:"edSave",text:"Tudo gravado"}), go,
+    el("p",{class:"note",style:"flex-basis:100%;margin:0",text:"Protótipo: o que mudar aqui fica gravado, mas só entra no draft quando o editor for ligado ao sistema (quarta-feira)."}));
+}
+function desenharToc(){
+  const t=$("#edToc"); if(!t) return;
+  const a=(sid,i)=>{ const v=view(sid); const n=el("a",{href:"#",draggable:"true","data-sid":sid,class:v.incluir===false?"off":""},el("i",{text:String(i+1)}),el("span",{text:tituloSec(sid)}));
+    n.onclick=e=>{ e.preventDefault(); abrirSec(sid,true) };
+    n.ondragstart=e=>{ e.dataTransfer.setData("text/plain",sid); e.dataTransfer.effectAllowed="move" };
+    n.ondragover=e=>{ e.preventDefault(); n.classList.add("drop") };
+    n.ondragleave=()=>n.classList.remove("drop");
+    n.ondrop=e=>{ e.preventDefault(); n.classList.remove("drop"); const de=e.dataTransfer.getData("text/plain"); if(!de||de===sid) return;
+      const o=ordem().filter(x=>x!==de); o.splice(o.indexOf(sid),0,de); setv("cfg",["ordem"],o,{now:true}); desenhar() };
+    return n };
+  const add=el("button",{class:"btn sm",type:"button"},"+ Juntar secção"); add.onclick=()=>galeria(null);
+  t.replaceChildren(el("b",{text:"Secções"}), ...ordem().map(a), podeEscrever?add:"");
+}
+function abrirSec(sid,rolar){
+  ED.aberta=(ED.aberta===sid&&!rolar)?null:sid; if(ED.room) ED.room.presence({secao:ED.aberta}).catch(()=>{});
+  desenhar();
+  if(ED.aberta){ const c=document.getElementById("c-"+sid); if(c&&rolar) c.scrollIntoView({behavior:"smooth",block:"start"}) }
+}
+
+/* ---------- campos ---------- */
+let fseq=0;
+function campo({key,path,label,ajuda,traduz,multi,tipo,ex,wide}){
+  const id="f"+(++fseq)+"-"+key+"-"+path.join("_");
+  const p=traduz?[...path,ED.lang]:path;
+  const v=getv(key,p);
+  let inp;
+  if(tipo==="select"){ inp=el("select",{id}); (ex||[]).forEach(o=>{ const op=el("option",{value:o},o); if(o===v) op.selected=true; inp.append(op) }) }
+  else if(multi){ inp=el("textarea",{id,rows:"3"}); inp.value=v||"" }
+  else { inp=el("input",{id,type:tipo||"text"}); inp.value=v||"" }
+  if(ex&&tipo!=="select") inp.placeholder=ex;
+  inp.dataset.k=key; inp.dataset.p=JSON.stringify(p);
+  if(!podeEscrever) inp.disabled=true;
+  inp.addEventListener(tipo==="select"?"change":"input",()=>{
+    setv(key,p,inp.value);
+    if(traduz&&ED.lang==="pt"){ const en=getv(key,[...path,"en"]), man=getv(key,[...path,"en_m"]); if(en&&!man) setv(key,[...path,"en"],"") }
+    if(traduz&&ED.lang==="en") setv(key,[...path,"en_m"],!!inp.value);
+    if(path[0]==="menu"||(path[0]==="cab"&&path[1]==="title")) desenharToc();
+  });
+  const lab=el("span",{},label, ajuda?el("em",{text:ajuda}):"", traduz&&ED.lang==="en"?el("em",{text:"inglês"}):"");
+  const f=el("label",{class:"f"+(wide?" wide":""),for:id},lab,inp);
+  if(traduz&&ED.lang==="en") f.append(el("div",{class:"pt","data-k":key,"data-ptref":JSON.stringify([...path,"pt"]),text:getv(key,[...path,"pt"])||"(em branco em português)"}));
+  return f;
+}
+function interruptor(key,path,label){
+  const id="t"+(++fseq)+"-"+key;
+  const i=el("input",{type:"checkbox",id}); i.checked=getv(key,path)!==false; i.dataset.k=key; i.dataset.p=JSON.stringify(path);
+  if(!podeEscrever) i.disabled=true;
+  i.onchange=()=>{ setv(key,path,i.checked,{now:true}); desenhar() };
+  return el("label",{class:"tog",for:id},i,label);
+}
+function ehImagem(n){ return /\.(png|jpe?g|gif|webp|svg|avif)$/i.test(n||"") }
+function campoMedia({key,path,label,ajuda,wide}){
+  const id="m"+(++fseq)+"-"+key;
+  const v=getv(key,path)||"";
+  const thumb=el("div",{class:"thumb"});
+  const pinta=val=>{ const m=/^asset:([^/]+)\/(.*)$/.exec(val||""); thumb.style.backgroundImage=""; thumb.textContent="";
+    if(m&&ehImagem(m[2])) thumb.style.backgroundImage=`url("/_blob/${m[1]}")`;
+    else thumb.textContent=val?(/^https?:/i.test(val)?"link":/^asset:/.test(val)?"ficheiro":"Media"):"sem"; };
+  pinta(v);
+  const inp=el("input",{id,type:"text",placeholder:"nome na pasta Media ou link"});
+  inp.value=v.startsWith("asset:")?v.replace(/^asset:[^/]+\//,"carregado: "):v;
+  inp.dataset.p=JSON.stringify(path);
+  if(!podeEscrever) inp.disabled=true;
+  inp.addEventListener("input",()=>{ if(inp.value.startsWith("carregado: ")) return; setv(key,path,inp.value.trim()); pinta(inp.value.trim()) });
+  const ctl=el("div",{class:"ctl"},inp);
+  const box=el("div",{class:"media"},thumb,ctl);
+  const enviar=async file=>{
+    if(!assetsNS){ estadoGrav("Sem permissão para carregar ficheiros: use a pasta Media ou um link.","err"); return }
+    if(file.size>20*1024*1024){ estadoGrav("O ficheiro passa dos 20 MB: ponha-o na pasta Media ou use um link.","err"); return }
+    estadoGrav("A carregar "+file.name+"...");
+    try{ const r=await assetsNS.upload(file); const val="asset:"+r.id+"/"+file.name.replace(/[^\w.\-]+/g,"-");
+      setv(key,path,val,{now:true}); inp.value="carregado: "+val.replace(/^asset:[^/]+\//,""); pinta(val); estadoGrav("Carregado às "+hora()) }
+    catch(err){ estadoGrav(err&&err.code==="unsupported_type"?"Esse tipo de ficheiro não é aceite.":"Não carregou o ficheiro. Tente de novo.","err") }
+  };
+  if(assetsNS&&podeEscrever){
+    const fi=el("input",{type:"file",hidden:"",accept:"image/*,video/*,.pdf,.svg"});
+    fi.onchange=()=>{ if(fi.files[0]) enviar(fi.files[0]) };
+    const b=el("button",{class:"btn sm",type:"button"},"Carregar"); b.onclick=()=>fi.click();
+    ctl.append(b,fi);
+    box.ondragover=e=>{ e.preventDefault(); box.classList.add("over") };
+    box.ondragleave=()=>box.classList.remove("over");
+    box.ondrop=e=>{ e.preventDefault(); box.classList.remove("over"); const f=e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) enviar(f) };
+  }
+  if(v){ const x=el("button",{class:"ib",type:"button",title:"Tirar ficheiro","aria-label":"Tirar ficheiro"},"×"); x.onclick=()=>{ setv(key,path,"",{now:true}); inp.value=""; pinta("") }; if(podeEscrever) ctl.append(x) }
+  return el("div",{class:"f"+(wide?" wide":"")},el("span",{},label,ajuda?el("em",{text:ajuda}):""),box);
+}
+
+/* ---------- cartão: dados gerais ---------- */
+function cartaoCfg(){
+  const k="cfg", c=(view("cfg").config)||{}; const P=a=>["config",...a];
+  const aberto=ED.aberta==="cfg";
+  const h=el("div",{class:"card-h"},el("span",{class:"num",text:"·"}),
+    el("div",{class:"tt"},el("b",{text:"Dados gerais"}),el("small",{text:[c.cliente,c.marca,c.formato,c.idiomas].filter(Boolean).join(" · ")})),
+    el("div",{class:"tools"},el("span",{class:"chip blk",text:aberto?"Fechar":"Abrir"})));
+  h.onclick=()=>abrirSec("cfg");
+  const card=el("section",{class:"card cfg",id:"c-cfg"},h);
+  if(!aberto) return card;
+  const corpo=el("div",{class:"card-b"},
+    el("div",{class:"row2"},
+      campo({key:k,path:P(["titulo"]),label:"Título da apresentação",traduz:true,ex:"ex.: Galp 2027"}),
+      campo({key:k,path:P(["barra"]),label:"Texto da barra de topo",traduz:true,ex:"ex.: YOUNGNETWORK · PROPOSTA 2027"})),
+    el("div",{class:"row2"},
+      campo({key:k,path:P(["cliente"]),label:"Cliente"}),
+      campo({key:k,path:P(["marca"]),label:"Marca que assina",tipo:"select",ex:MARCAS}),
+      campo({key:k,path:P(["formato"]),label:"Formato",tipo:"select",ex:["Página","Reel"]}),
+      campo({key:k,path:P(["idiomas"]),label:"Idiomas",tipo:"select",ex:["PT+EN","PT","PT+EN+ES","EN"]})),
+    el("div",{class:"row2"},
+      el("div",{class:"f"},el("span",{},"Acesso"),interruptor(k,P(["com_senha"]),"Só abre com senha")),
+      c.com_senha!==false?campo({key:k,path:P(["senha"]),label:"Senha do cliente",ajuda:"em branco, o sistema cria uma"}):"",
+      el("div",{class:"f"},el("span",{},"Resumo"),interruptor(k,P(["one_page"]),"Gerar também a one page")),
+      c.formato==="Reel"?el("div",{class:"f"},el("span",{},"Reel"),interruptor(k,P(["autoplay"]),"Abre a correr sozinho")):""),
+    el("div",{class:"row2"},
+      campo({key:k,path:P(["cor1"]),label:"Cor principal",ajuda:"hexadecimal, só para trocar a da marca",ex:"#E74F3D"}),
+      campo({key:k,path:P(["cor2"]),label:"Cor secundária",ex:"#0044FF"}),
+      campo({key:k,path:P(["pedido_por"]),label:"Email de quem pede",tipo:"email",ajuda:"recebe os links e as senhas"})),
+    campoMedia({key:k,path:P(["logo_cliente"]),label:"Logótipo do cliente",ajuda:"opcional"}));
+  card.append(corpo); return card;
+}
+
+/* ---------- cartão: secção ---------- */
+function cartaoSec(sid,i){
+  const v=view(sid), b=BL[v.bloco]||BL["Bloco livre"], aberto=ED.aberta===sid, n=ordem().length;
+  const mexe=(d)=>{ const o=ordem(); const j=o.indexOf(sid), t=j+d; if(t<0||t>=o.length) return; [o[j],o[t]]=[o[t],o[j]]; setv("cfg",["ordem"],o,{now:true}); desenhar() };
+  const up=el("button",{class:"ib",type:"button",title:"Subir","aria-label":"Subir secção"},"↑"); up.disabled=i===0||!podeEscrever; up.onclick=e=>{ e.stopPropagation(); mexe(-1) };
+  const dn=el("button",{class:"ib",type:"button",title:"Descer","aria-label":"Descer secção"},"↓"); dn.disabled=i===n-1||!podeEscrever; dn.onclick=e=>{ e.stopPropagation(); mexe(1) };
+  const tools=el("div",{class:"tools"},
+    el("span",{class:"chip who","data-who":sid,hidden:""}),
+    v.escrever_no_draft?el("span",{class:"chip wr",text:"Escreve no draft"}):"",
+    v.incluir===false?el("span",{class:"chip blk",text:"Fora do deck"}):"", up, dn);
+  const h=el("div",{class:"card-h"},el("span",{class:"num",text:String(i+1)}),
+    el("div",{class:"tt"},el("b",{text:tituloSec(sid)}),el("small",{"data-sum":sid,text:resumoSec(sid)})),tools);
+  h.onclick=()=>abrirSec(sid);
+  const card=el("section",{class:"card"+(v.incluir===false?" off":""),id:"c-"+sid},h);
+  if(!aberto) return card;
+
+  const troca=el("button",{class:"btn sm",type:"button"},"Trocar bloco"); troca.onclick=()=>galeria(sid); if(!podeEscrever) troca.disabled=true;
+  const corpo=el("div",{class:"card-b"});
+  const blk=el("div",{class:"blkrow"}); blk.innerHTML=sk(b.tipo); blk.append(el("p",{},el("b",{text:v.bloco}),b.desc),troca);
+  corpo.append(blk);
+  corpo.append(el("div",{class:"row2"},
+    campo({key:sid,path:["menu"],label:"Nome no menu",traduz:true,ex:"ex.: Resultados"}),
+    el("div",{class:"f"},el("span",{},"No deck"),interruptor(sid,["incluir"],"Incluir esta secção")),
+    (view("cfg").config||{}).formato==="Reel"?campo({key:sid,path:["dur"],label:"Duração no reel (s)",ex:"8"}):""));
+  // ideias + escrita
+  const ide=campo({key:sid,path:["ideias"],label:"Ideias",ajuda:"em bruto: o que quer dizer nesta secção",multi:true}); ide.classList.add("ideias");
+  corpo.append(ide, linhaEscrever(sid));
+  // campos do bloco
+  const cab=b.cab.filter(c=>c.k!=="pedido");
+  const grid=el("div",{class:"row2"});
+  cab.forEach(c=>{
+    if(c.k==="media") return;
+    grid.append(campo({key:sid,path:["cab",c.k],label:c.l,traduz:c.t,multi:c.k==="text",wide:c.k==="text",ajuda:c.k==="text"?"até 40 palavras":""}));
+  });
+  corpo.append(grid);
+  const med=b.cab.find(c=>c.k==="media"); if(med) corpo.append(campoMedia({key:sid,path:["cab","media"],label:med.l,ajuda:"imagem ou vídeo"}));
+  if(b.tab.length) corpo.append(listaItens(sid,b));
+  corpo.append(campo({key:sid,path:["cab","pedido"],label:"Como deve ficar",ajuda:v.bloco==="Bloco livre"?"obrigatório neste bloco":"opcional",multi:true,ex:"ex.: vídeo à esquerda, números à direita"}));
+  const apagar=el("button",{class:"btn sm",type:"button"},"Tirar secção do deck");
+  apagar.onclick=()=>{ if(apagar.dataset.ok){ setv("cfg",["ordem"],ordem().filter(x=>x!==sid),{now:true}); ED.aberta=null; desenhar(); return }
+    apagar.dataset.ok="1"; apagar.textContent="Carregue outra vez para tirar"; apagar.classList.add("primary") };
+  if(podeEscrever) corpo.append(el("div",{class:"actions"},apagar));
+  card.append(corpo); return card;
+}
+function linhaEscrever(sid){
+  const v=view(sid), box=el("div",{class:"write"});
+  if(!podeEscrever) return box;
+  const ja=el("button",{class:"btn sm primary",type:"button"},"Escrever agora com o Claude");
+  ja.onclick=()=>escreverAgora(sid,ja);
+  const nd=el("button",{class:"btn sm",type:"button"},v.escrever_no_draft?"Não escrever no draft":"Escrever no próximo draft");
+  nd.onclick=()=>{ setv(sid,["escrever_no_draft"],!v.escrever_no_draft,{now:true}); desenhar() };
+  box.append(ja,nd);
+  if(ED.prev[sid]){ const u=el("button",{class:"btn sm",type:"button"},"Desfazer"); u.onclick=()=>{ const p=ED.prev[sid]; delete ED.prev[sid]; for(const k in p) setv(sid,["cab",k],p[k],{now:true}); desenhar() }; box.append(u) }
+  box.append(el("span",{class:"note2",id:"wn-"+sid,text:v.escrever_no_draft?"O sistema escreve os textos a partir das ideias no próximo draft, na conta do JD.":"Agora: gasta do seu plano Claude. No draft: não gasta nada, vê-se no draft."}));
+  return box;
+}
+async function escreverAgora(sid,btn){
+  const nota2=$("#wn-"+sid), v=view(sid), b=BL[v.bloco]||BL["Bloco livre"], cfg=view("cfg").config||{};
+  if(!(v.ideias||"").trim()){ nota2.textContent="Escreva primeiro as ideias desta secção."; return }
+  if(!sampleNS) sampleNS=await claude.use("sample");
+  if(!sampleNS){ nota2.textContent="O Claude não está disponível nesta vista. Use \"Escrever no próximo draft\"."; return }
+  btn.disabled=true; btn.textContent="A escrever..."; nota2.textContent="O Claude está a escrever. Pode demorar uns segundos.";
+  const campos=b.cab.filter(c=>c.t).map(c=>`"${c.k}" (${c.l})`).join(", ");
+  const temLista=b.tab.length&&!itensDe(v).length;
+  const colunas=b.tab.filter(c=>c.k!=="media"&&c.k!=="poster").map(c=>`"${c.k}" (${c.l}${c.a?": "+c.a:""})`).join(", ");
+  const pedido=`És redator do YoungNetwork Group. Escreve os textos de uma secção de uma apresentação web.
+Marca: ${cfg.marca||"YoungNetwork Group"}. ${TOM[cfg.marca]||"Tom profissional, claro e direto."}
+Cliente: ${cfg.cliente||"(não indicado)"}. Deck: ${tr(cfg.titulo).pt||""}.
+Bloco: ${v.bloco} (${b.desc}).
+Ideias do autor:
+"""${v.ideias}"""
+Regras: português de Portugal; sem travessões (usa vírgulas, dois pontos ou parênteses); usa só o que está nas ideias, nunca inventes números, nomes, datas, clientes ou resultados; pequeno título até 4 palavras; título até 8 palavras; texto até 40 palavras.
+Responde só com JSON com as chaves ${campos}${temLista?`, e "itens": uma lista de objetos com as chaves ${colunas} (uma linha por elemento que as ideias referem; só o que lá está)`:""}, e "falta": o que faltou nas ideias para completar (texto curto, ou vazio).`;
+  try{
+    const r=await sampleNS.json(pedido,{modelTier:"default"});
+    const prev={}; b.cab.filter(c=>c.t).forEach(c=>{ if(typeof r[c.k]==="string"&&r[c.k].trim()){ prev[c.k]=clone(getv(sid,["cab",c.k])||{pt:"",en:""}); setv(sid,["cab",c.k],{pt:r[c.k].trim(),en:"",en_m:false}) } });
+    if(temLista&&Array.isArray(r.itens)) r.itens.slice(0,15).forEach((it,j)=>{ const d={o:j+1,incluir:true}; b.tab.forEach(c=>{ const x=it[c.k]; if(x==null||x==="") return; d[c.k]=c.t?{pt:String(x),en:""}:String(x) }); setv(sid,["itens",nid("i")],d) });
+    ED.prev[sid]=prev; flush(sid);
+    desenhar(); const n=$("#wn-"+sid); if(n) n.textContent="Escrito. Reveja e corrija o que precisar."+(r.falta?" Faltou: "+r.falta:"");
+  }catch(err){
+    btn.disabled=false; btn.textContent="Escrever agora com o Claude";
+    nota2.textContent=err&&err.code==="not_granted"?"Sem autorização para usar o Claude aqui. Use \"Escrever no próximo draft\".":err&&err.code==="rate_limited"?"Chegou ao limite do seu plano por agora. Use \"Escrever no próximo draft\".":"Não conseguiu escrever. Tente outra vez ou use \"Escrever no próximo draft\".";
+  }
+}
+
+/* ---------- listas (cases, números, contactos...) ---------- */
+function listaItens(sid,b){
+  const its=itensDe(view(sid));
+  const box=el("div",{class:"items"},el("b",{text:"Elementos · "+its.length}));
+  its.forEach((it,j)=>{
+    const flds=el("div",{class:"flds"});
+    b.tab.forEach(c=>{
+      const path=["itens",it.id,c.k];
+      if(c.k==="media"||c.k==="poster") flds.append(campoMedia({key:sid,path,label:c.l,wide:true}));
+      else flds.append(campo({key:sid,path,label:c.l,traduz:c.t,multi:c.k==="text",ex:c.ex||c.a,wide:c.k==="text"}));
+    });
+    const tro=(d)=>{ const o=its[j+d]; if(!o) return; setv(sid,["itens",it.id,"o"],o.o||j+1+d); setv(sid,["itens",o.id,"o"],it.o||j+1,{now:true}); desenhar() };
+    const up=el("button",{class:"ib",type:"button","aria-label":"Subir"},"↑"); up.disabled=j===0; up.onclick=()=>tro(-1);
+    const dn=el("button",{class:"ib",type:"button","aria-label":"Descer"},"↓"); dn.disabled=j===its.length-1; dn.onclick=()=>tro(1);
+    const vis=el("button",{class:"ib",type:"button",title:it.incluir===false?"Mostrar no deck":"Esconder do deck","aria-label":"Mostrar ou esconder"},it.incluir===false?"◌":"●"); vis.onclick=()=>{ setv(sid,["itens",it.id,"incluir"],it.incluir===false,{now:true}); desenhar() };
+    const x=el("button",{class:"ib",type:"button",title:"Apagar","aria-label":"Apagar elemento"},"×"); x.onclick=()=>{ setv(sid,["itens",it.id,"apagado"],true,{now:true}); desenhar() };
+    const ctl=podeEscrever?el("div",{class:"ictl"},up,dn,vis,x):el("div");
+    box.append(el("div",{class:"it"+(it.incluir===false?" off":"")},flds,ctl));
+  });
+  if(podeEscrever){ const add=el("button",{class:"btn sm",type:"button"},"+ Juntar elemento"); add.onclick=()=>{ const m=Math.max(0,...its.map(i=>i.o||0)); setv(sid,["itens",nid("i")],{o:m+1,incluir:true},{now:true}); desenhar() }; box.append(add) }
+  if(its.length>=15) box.append(el("p",{class:"note",text:"O motor usa até 15 elementos por secção."}));
+  return box;
+}
+
+/* ---------- galeria de blocos ---------- */
+function galeria(sid){
+  const d=el("dialog",{class:"gal"});
+  const fechar=el("button",{class:"btn sm",type:"button"},"Fechar"); fechar.onclick=()=>d.close();
+  const g=el("div",{class:"gal-g"});
+  const atual=sid?view(sid).bloco:null;
+  Object.entries(BL).forEach(([nome,b])=>{
+    const bt=el("button",{type:"button","aria-current":String(nome===atual)}); bt.innerHTML=sk(b.tipo); bt.append(el("b",{text:nome}),el("small",{text:b.desc}));
+    bt.onclick=async()=>{ d.close();
+      if(sid){ setv(sid,["bloco"],nome,{now:true}); desenhar(); return }
+      const novo=nid("s"); const agora=new Date().toISOString();
+      try{ await db.doc("fichas/"+ED.id+"/seccoes/"+novo).set({bloco:nome,incluir:true,menu:{pt:"",en:""},ideias:"",cab:{},itens:{},criado_em:agora});
+        setv("cfg",["ordem"],[...ordem(),novo],{now:true}); ED.aberta=novo; setTimeout(()=>abrirSec(novo,true),300) }
+      catch(err){ estadoGrav("Não foi possível juntar a secção.","err") } };
+    g.append(bt);
+  });
+  d.append(el("div",{class:"gal-h"},el("h2",{text:sid?"Trocar bloco":"Escolha o bloco da nova secção"}),fechar),g);
+  d.addEventListener("close",()=>d.remove());
+  document.body.append(d); d.showModal();
+}
+
 </script>
