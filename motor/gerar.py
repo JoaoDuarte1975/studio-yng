@@ -782,6 +782,157 @@ def estado(xlsx, valores):
     wb.save(xlsx)
 
 
+# ------------------------------------------------------------------ ficha do painel (editor web)
+CAB_DB = {"ideias": "Ideias", "kicker": K, "title": T, "text": X, "media": F, "pedido": P}
+
+def _trd(v):
+    if isinstance(v, dict): return v.get("pt") or "", v.get("en") or ""
+    return (v or ""), ""
+
+def _media_db(v, assets):
+    v = (v or "").strip()
+    m = re.match(r"^asset:([^/]+)/(.+)$", v)
+    if m:
+        assets.append({"id": m.group(1), "nome": m.group(2)}); return m.group(2)
+    return v
+
+def _ativos_ficha(d):
+    secs = d.get("seccoes", {})
+    return [sid for sid in d.get("ordem", []) if sid in secs]
+
+def _itens_ficha(sec):
+    its = [(k, v) for k, v in (sec.get("itens") or {}).items() if isinstance(v, dict) and not v.get("apagado")]
+    return sorted(its, key=lambda kv: (kv[1].get("o") or 0))
+
+def da_ficha(fj, saida):
+    """Ficha do painel (JSON: config, ordem, seccoes{sid:doc}, id) -> Excel do motor. Mantém os campos automáticos do Excel anterior."""
+    d = json.load(open(fj, encoding="utf-8"))
+    c = d.get("config", {}); assets = []; avisos = []; escrever = []
+    antigo = {}
+    if Path(saida).exists():
+        try: antigo, _ = ler(saida)
+        except Exception: antigo = {}
+    sim = lambda b: "N" if b is False else "S"
+    tpt, ten = _trd(c.get("titulo")); bpt, ben = _trd(c.get("barra"))
+    cfg = {"Título PT": tpt, "Título EN": ten, "Barra PT": bpt, "Barra EN": ben, "Cliente": c.get("cliente", ""),
+           "Endereço": d.get("id", ""), "Marca": c.get("marca") or "YoungNetwork Group", "Com senha": sim(c.get("com_senha")),
+           "Senha": c.get("senha") or antigo.get("Senha", ""), "Formato": c.get("formato") or "Página", "Idiomas": c.get("idiomas") or "PT+EN",
+           "Reprodução automática": sim(c.get("autoplay")), "One page resumo": sim(c.get("one_page")),
+           "Cor principal": c.get("cor1", ""), "Cor secundária": c.get("cor2", ""),
+           "Logo da marca": _media_db(c.get("logo_marca"), assets), "Logo cliente": _media_db(c.get("logo_cliente"), assets),
+           "Pedido por": c.get("pedido_por", "")}
+    for k in AUTO:
+        if k not in ("Título EN", "Barra EN") and antigo.get(k): cfg[k] = antigo[k]
+    cfg.setdefault("Estado", "Ficha")
+    sids = _ativos_ficha(d)
+    if len(sids) > N_SECCOES:
+        avisos.append(f"A ficha tem {len(sids)} secções; o motor usa as primeiras {N_SECCOES}."); sids = sids[:N_SECCOES]
+    seccoes = []; en_pos = []
+    for n, sid in enumerate(sids, 1):
+        s = d["seccoes"][sid]; nome = s.get("bloco") or "Bloco livre"; base = _base(nome) or "Bloco livre"
+        cab_db = s.get("cab") or {}
+        mpt, men = _trd(s.get("menu"))
+        sec = {"Bloco": nome, "Incluir": sim(s.get("incluir")), "Nome no menu": mpt, "Nome no menu EN": men, "Ordem": n,
+               "Duração no reel (s)": s.get("dur") or "", "cab": {"Ideias": s.get("ideias", "")}, "lista": []}
+        for k, rot in CAB_DB.items():
+            if k == "ideias": continue
+            v = cab_db.get(k)
+            if k == "media": sec["cab"][rot] = _media_db(v, assets)
+            elif k == "pedido": sec["cab"][rot] = v if isinstance(v, str) else _trd(v)[0]
+            else:
+                pt, en = _trd(v); sec["cab"][rot] = pt
+                if en: en_pos.append(("cab", n, k, None, en))
+        tab = BLOCOS[base]["tab"]
+        its = _itens_ficha(s)
+        if len(its) > N_ELEM:
+            avisos.append(f"Secção {n} ({mpt or nome}): {len(its)} elementos; o motor usa os primeiros {N_ELEM}."); its = its[:N_ELEM]
+        for j, (iid, it) in enumerate(its):
+            linha = {"Incluir": sim(it.get("incluir"))}
+            for rot, campo, traduz, *_x in tab:
+                v = it.get(campo)
+                if campo in ("media", "poster"): linha[rot] = _media_db(v, assets)
+                else:
+                    pt, en = _trd(v); linha[rot] = pt
+                    if traduz and en: en_pos.append(("item", n, campo, j, en))
+            sec["lista"].append(linha)
+        if s.get("escrever_no_draft"): escrever.append(n)
+        seccoes.append(sec)
+    criar_modelo(saida, {"config": cfg, "seccoes": seccoes})
+    # inglês (o modelo só escreve o português)
+    _, secs = ler(saida); por_n = {x["n"]: x for x in secs}
+    wb = openpyxl.load_workbook(saida); ws = wb[FOLHA]
+    for sec in seccoes:
+        x = por_n.get(sec["Ordem"])
+        if x and sec.get("Nome no menu EN"): r_, c_ = x["pos"]["menu"]; ws.cell(r_, c_, sec["Nome no menu EN"])
+    for tipo, n, campo, j, en in en_pos:
+        x = por_n.get(n)
+        if not x: continue
+        if tipo == "cab" and campo in x["pos"]: r_, c_ = x["pos"][campo]; ws.cell(r_, c_, en)
+        if tipo == "item" and j < len(x["itens"]) and campo in x["itens"][j]["_pos"]: r_, c_ = x["itens"][j]["_pos"][campo]; ws.cell(r_, c_, en)
+    wb.save(saida)
+    return {"xlsx": str(saida), "seccoes": len(seccoes), "assets": assets, "escrever_no_draft": escrever, "avisos": avisos,
+            "senha_draft": cfg.get("Senha draft", ""), "senha": cfg.get("Senha", "")}
+
+def para_ficha(xlsx, fj):
+    """Depois de traduzir (e de escrever textos no draft): o que o Excel tem e a ficha do painel não tem.
+    -> {"cfg": patch do documento fichas/<id>, "seccoes": {sid: patch}} com pt/en só onde a ficha está vazia."""
+    d = json.load(open(fj, encoding="utf-8")); cfg, secs = ler(xlsx)
+    out = {"cfg": {}, "seccoes": {}}
+    c = d.get("config", {})
+    for chave, rot in (("titulo", "Título"), ("barra", "Barra")):
+        pt, en = _trd(c.get(chave)); p = {}
+        if not pt and cfg.get(rot + " PT"): p["pt"] = cfg[rot + " PT"]
+        if not en and cfg.get(rot + " EN"): p["en"] = cfg[rot + " EN"]
+        if p: out["cfg"].setdefault("config", {})[chave] = p
+    if not c.get("senha") and cfg.get("Senha") and (c.get("com_senha") is not False):
+        out["cfg"].setdefault("config", {})["senha"] = cfg["Senha"]
+    por_n = {x["n"]: x for x in secs}
+    for n, sid in enumerate(_ativos_ficha(d)[:N_SECCOES], 1):
+        s = d["seccoes"][sid]; x = por_n.get(n)
+        if not x: continue
+        p = {}
+        mpt, men = _trd(s.get("menu")); xm = x["menu"] or {}
+        if not men and xm.get("en"): p["menu"] = {"en": xm["en"]}
+        for k in ("kicker", "title", "text"):
+            pt, en = _trd((s.get("cab") or {}).get(k)); v = x["cab"].get(k) or {}
+            q = {}
+            if not pt and v.get("pt"): q["pt"] = v["pt"]
+            if not en and v.get("en"): q["en"] = v["en"]
+            if q: p.setdefault("cab", {})[k] = q
+        its = _itens_ficha(s)[:N_ELEM]; xits = x["itens"]
+        for j, (iid, it) in enumerate(its):
+            if j >= len(xits): break
+            for campo, v in xits[j].items():
+                if campo.startswith("_") or not isinstance(v, dict): continue
+                pt, en = _trd(it.get(campo)); q = {}
+                if not pt and v.get("pt"): q["pt"] = v["pt"]
+                if not en and v.get("en"): q["en"] = v["en"]
+                if q: p.setdefault("itens", {}).setdefault(iid, {})[campo] = q
+        if s.get("escrever_no_draft") and (p.get("cab")): p["escrever_no_draft"] = False
+        if p: out["seccoes"][sid] = p
+    return out
+
+def ficha_vazia(nome, cliente, marca, formato, idiomas, pedido_por):
+    """Ficha nova para o painel, com o esqueleto típico."""
+    cfg = {"titulo": {"pt": nome, "en": ""}, "barra": {"pt": "", "en": ""}, "cliente": cliente, "marca": marca, "formato": formato,
+           "idiomas": idiomas, "com_senha": True, "senha": "", "one_page": True, "autoplay": True, "cor1": "", "cor2": "",
+           "logo_marca": "", "logo_cliente": "", "pedido_por": pedido_por}
+    seccoes = {}; ordem = []
+    for i, (b, m) in enumerate(ESQUELETO, 1):
+        sid = "s%02d" % i; ordem.append(sid)
+        seccoes[sid] = {"bloco": b, "incluir": True, "menu": {"pt": m, "en": ""}, "ideias": "", "cab": {}, "itens": {}}
+    return {"config": cfg, "ordem": ordem, "seccoes": seccoes}
+
+def assinatura_ficha(fj):
+    """Resumo da ficha do painel (para o Publicar recusar uma ficha mudada depois do draft)."""
+    import hashlib
+    d = json.load(open(fj, encoding="utf-8"))
+    sids = _ativos_ficha(d)
+    lixo = {"atualizado_em", "atualizado_por", "criado_em"}
+    limpa = lambda o: {k: v for k, v in o.items() if k not in lixo} if isinstance(o, dict) else o
+    base = {"config": d.get("config", {}), "ordem": sids, "seccoes": {sid: limpa(d["seccoes"][sid]) for sid in sids}}
+    return {"assinatura_ficha": hashlib.sha256(json.dumps(base, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:16]}
+
 def main():
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
@@ -793,6 +944,10 @@ def main():
     a = sp.add_parser("procurar"); a.add_argument("raiz")
     a = sp.add_parser("estado"); a.add_argument("xlsx"); a.add_argument("pares", nargs="+", help='"Campo=valor"')
     a = sp.add_parser("comentario"); a.add_argument("xlsx"); a.add_argument("secao"); a.add_argument("texto")
+    a = sp.add_parser("da-ficha"); a.add_argument("ficha"); a.add_argument("xlsx")
+    a = sp.add_parser("para-ficha"); a.add_argument("xlsx"); a.add_argument("ficha")
+    a = sp.add_parser("assinatura-ficha"); a.add_argument("ficha")
+    a = sp.add_parser("ficha-vazia"); a.add_argument("nome"); a.add_argument("--cliente", default=""); a.add_argument("--marca", default="YoungNetwork Group"); a.add_argument("--formato", default="Página"); a.add_argument("--idiomas", default="PT+EN"); a.add_argument("--pedido-por", default="")
     a = sp.add_parser("construir"); a.add_argument("xlsx"); a.add_argument("--media", required=True); a.add_argument("--saida", required=True)
     a.add_argument("--desenhos", help="pasta com cena-secao-<n>.html (e resumo.html) desenhados à medida")
     a.add_argument("--modo", choices=["draft", "publicar"], default="publicar")
@@ -808,6 +963,10 @@ def main():
     elif x.cmd == "procurar": j(procurar(x.raiz))
     elif x.cmd == "estado": estado(x.xlsx, dict(p.split("=", 1) for p in x.pares))
     elif x.cmd == "comentario": j(comentario(x.xlsx, x.secao, x.texto))
+    elif x.cmd == "da-ficha": j(da_ficha(x.ficha, x.xlsx))
+    elif x.cmd == "para-ficha": j(para_ficha(x.xlsx, x.ficha))
+    elif x.cmd == "assinatura-ficha": j(assinatura_ficha(x.ficha))
+    elif x.cmd == "ficha-vazia": j(ficha_vazia(x.nome, x.cliente, x.marca, x.formato, x.idiomas, x.pedido_por))
     elif x.cmd == "construir": j(construir(x.xlsx, x.media, x.saida, x.desenhos, x.modo))
     elif x.cmd == "assinatura": print(assinatura(x.xlsx, x.media, x.desenhos))
 
