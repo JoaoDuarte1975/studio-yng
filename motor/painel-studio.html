@@ -219,14 +219,14 @@ dialog.gal::backdrop{background:rgba(0,0,0,.45)}
 <div class="wrap">
 <div id="home">
   <header>
-    <div class="mark"><b>Studio <span>YNG</span></b><small>Decks YoungNetwork Group</small></div>
+    <div class="mark"><b>Young <span>Studio</span></b><small>Decks YoungNetwork Group</small></div>
     <button class="btn primary" id="bNova" type="button">+ Nova apresentação</button>
   </header>
   <p class="note" id="note">A carregar as apresentações...</p>
 
   <form id="form" hidden autocomplete="off">
     <h2>Nova apresentação</h2>
-    <p>Ao carregar em "Criar ficha", o sistema cria logo a pasta no Studio YNG com a ficha em Excel pronta a preencher. Demora uns minutos; o botão "Ficha do Deck" aparece na lista e chega um email.</p>
+    <p>Ao carregar em "Criar ficha", o sistema cria a pasta do deck e a ficha, pronta a preencher aqui no Young Studio. Demora uns minutos; o botão "Ficha do Deck" aparece na lista e chega um email.</p>
     <div class="fields">
       <label>Nome da apresentação<input id="fNome" required maxlength="80" placeholder="ex.: Galp 2027"></label>
       <label>Cliente<input id="fCliente" maxlength="80" placeholder="ex.: Galp"></label>
@@ -251,8 +251,8 @@ dialog.gal::backdrop{background:rgba(0,0,0,.45)}
   <div class="list" id="list"></div>
 
   <section class="how" aria-label="Como funciona">
-    <div><b>1. Nova apresentação</b><p>Nome, cliente, marca. O sistema cria logo a pasta e a ficha em Excel.</p></div>
-    <div><b>2. Preencher a ficha</b><p>"Ficha do Deck": escolher os blocos, escrever as ideias e, se quiser, pedir ao Claude no Excel para escrever os textos. Vídeos na pasta Media ou por link.</p></div>
+    <div><b>1. Nova apresentação</b><p>Nome, cliente, marca. O sistema cria a pasta e a ficha do deck.</p></div>
+    <div><b>2. Preencher a ficha</b><p>"Ficha do Deck": escolher os blocos, escrever as ideias e, se quiser, "Escrever agora com o Claude". Imagens carregadas na ficha; vídeos na pasta Media ou por link.</p></div>
     <div><b>3. Gerar draft</b><p>Gera a apresentação num link interno, só para a equipa. Para mudar, "Comentar draft" (ou corrigir a ficha) e gerar de novo as vezes que for preciso.</p></div>
     <div><b>4. Publicar</b><p>Com o draft aprovado: sai o link final para o consultor, para apresentar ou enviar ao cliente por email.</p></div>
   </section>
@@ -267,7 +267,7 @@ const ORDEM=["pronta","gerar_draft","a_gerar_draft","draft","publicar","a_public
 const PENDENTES=["pedido","gerar_draft","publicar"];
 let db=null, user=null, mcp=null, rows=[], aberto=null, comentCache={}, rascunho={}, filtro="", podeEscrever=true, souDono=false, jaDisparei=false, primeiraLeitura=true, ultimoDisparo=0;
 const TAREFA="trig_01L5GPAgwVpikyaux9uzNs2o";
-const AVISO_ESPERA="Pedido registado. Arranca assim que o JD abrir o Studio YNG; recebe um email quando estiver pronto.";
+const AVISO_ESPERA="Pedido registado. Arranca assim que o JD abrir o Young Studio; recebe um email quando estiver pronto.";
 async function disparar(){
   if(!souDono) return false;
   try{ if(!mcp) mcp=await claude.use("mcp"); if(!mcp) return false;
@@ -284,11 +284,13 @@ function nota(t,k){ const n=$("#note"); n.textContent=t; n.dataset.k=k||""; n.hi
 
 function render(){
   const q=$("#q").value.trim().toLowerCase();
-  const cont={}; rows.forEach(r=>cont[r.estado]=(cont[r.estado]||0)+1);
+  const vivas=rows.filter(r=>!r.apagado), apagadas=rows.length-vivas.length;
+  const cont={}; vivas.forEach(r=>cont[r.estado]=(cont[r.estado]||0)+1);
   const c=$("#counts"); c.replaceChildren(
-    el("button",{type:"button","aria-pressed":String(!filtro),"data-f":""},"Todas",el("b",{text:String(rows.length)})),
-    ...ORDEM.filter(e=>cont[e]).map(e=>el("button",{type:"button","aria-pressed":String(filtro===e),"data-f":e},ESTADOS[e],el("b",{text:String(cont[e])}))));
-  const vis=rows.filter(r=>(!filtro||r.estado===filtro)&&(!q||(r.nome+" "+(r.cliente||"")).toLowerCase().includes(q)))
+    el("button",{type:"button","aria-pressed":String(!filtro),"data-f":""},"Todas",el("b",{text:String(vivas.length)})),
+    ...ORDEM.filter(e=>cont[e]).map(e=>el("button",{type:"button","aria-pressed":String(filtro===e),"data-f":e},ESTADOS[e],el("b",{text:String(cont[e])}))),
+    apagadas?el("button",{type:"button","aria-pressed":String(filtro==="apagadas"),"data-f":"apagadas"},"Apagadas",el("b",{text:String(apagadas)})):"");
+  const vis=rows.filter(r=>(filtro==="apagadas"?r.apagado:(!r.apagado&&(!filtro||r.estado===filtro)))&&(!q||(r.nome+" "+(r.cliente||"")).toLowerCase().includes(q)))
                 .sort((a,b)=>(b.atualizado_em||b.criado_em||"").localeCompare(a.atualizado_em||a.criado_em||""));
   const L=$("#list");
   if(!rows.length){ L.replaceChildren(el("div",{class:"empty"},el("b",{text:"Ainda não há apresentações."}),"Carregue em \"Nova apresentação\" para pedir a primeira. A pasta e a ficha aparecem aqui quando estiverem prontos.")); return }
@@ -305,6 +307,14 @@ function render(){
     if(r.estado==="draft"&&podeEscrever)
       go.append(el("button",{class:"btn sm primary",type:"button","data-acao":"publicar","data-id":r.id},r.link?"Publicar alterações":"Publicar"));
     if(r.link) go.append(el("a",{class:"btn sm",href:r.link,target:"_blank",rel:"noopener"},"Deck publicado"));
+    if(podeEscrever&&!["a_gerar_draft","a_publicar"].includes(r.estado)){
+      const ap=el("button",{class:"ib",type:"button",title:r.apagado?"Repor deck":"Apagar deck","aria-label":r.apagado?"Repor deck":"Apagar deck"},r.apagado?"↺":"×");
+      ap.onclick=async()=>{ if(!r.apagado&&!ap.dataset.ok){ ap.dataset.ok="1"; ap.textContent="Apagar?"; ap.style.width="auto"; ap.style.padding="0 8px"; setTimeout(()=>{ if(ap.isConnected){ delete ap.dataset.ok; ap.textContent="×"; ap.style.width=""; ap.style.padding="" } },4000); return }
+        try{ await db.collection("apresentacoes").doc(r.id).update(r.apagado?{apagado:false}:{apagado:true,apagado_em:new Date().toISOString()}); nota(r.apagado?"Deck reposto.":"Deck apagado. Está em \"Apagadas\" e pode ser reposto; a pasta e os links continuam.") }
+        catch(e){ nota("Não foi possível apagar. Tente de novo.","err") } };
+      go.append(ap);
+    }
+    if(r.apagado) [...go.children].forEach(ch=>{ if(ch.getAttribute("aria-label")!=="Repor deck") ch.remove() });
     const det=el("div",{class:"det"});
     if(r.estado==="publicada"){ if(r.publicado_em) det.append(el("span",{text:"Publicada "+new Date(r.publicado_em).toLocaleDateString("pt-PT")})) }
     else if(r.estado==="publicar") det.append(el("span",{text:"Pedida em "+quando(r.pedido_publicar_em)+". "+(r.aviso||"A publicar dentro de minutos.")}));
@@ -313,6 +323,9 @@ function render(){
     else if(r.estado==="gerar_draft") det.append(el("span",{text:"Pedido em "+quando(r.pedido_draft_em)+". "+(r.aviso||"O draft fica pronto dentro de minutos.")}));
     else if(r.estado==="a_gerar_draft") det.append(el("span",{text:"A gerar o draft."}));
     else if(r.estado==="draft"){ if(r.draft_em) det.append(el("span",{text:"Última atualização draft "+new Date(r.draft_em).toLocaleDateString("pt-PT")+", "+new Date(r.draft_em).toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"})})) }
+    if(r.senha_draft&&r.draft_link){ const cp=el("button",{class:"btn sm",type:"button",style:"padding:2px 8px;margin-left:6px"},"Copiar");
+      cp.onclick=async()=>{ try{ await navigator.clipboard.writeText(r.senha_draft); cp.textContent="Copiada" }catch(e){ const t=cp.previousSibling; const g=document.createRange(); g.selectNodeContents(t); const s2=getSelection(); s2.removeAllRanges(); s2.addRange(g) } };
+      det.append(el("small",{},"Senha draft: ",el("code",{text:r.senha_draft}),cp)) }
     if(r.pasta&&!["publicada","draft"].includes(r.estado)) det.append(el("small",{text:r.pasta}));
     const row=el("div",{class:"row"},
       el("div",{},el("h3",{text:r.nome}),el("div",{class:"meta",text:[r.cliente,r.marca,r.formato,r.idiomas].filter(Boolean).join(" · ")})),
@@ -597,8 +610,7 @@ function topo(){
     el("h1",{text:r.nome||ED.id}),
     el("span",{class:"grow"}),
     el("div",{class:"peers",id:"edPeers"}),
-    lang, el("span",{class:"ed-save",id:"edSave",text:"Tudo gravado"}), go,
-    el("p",{class:"note",style:"flex-basis:100%;margin:0",text:"Protótipo: o que mudar aqui fica gravado, mas só entra no draft quando o editor for ligado ao sistema (quarta-feira)."}));
+    lang, el("span",{class:"ed-save",id:"edSave",text:"Tudo gravado"}), go);
 }
 function desenharToc(){
   const t=$("#edToc"); if(!t) return;

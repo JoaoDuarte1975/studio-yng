@@ -12,7 +12,7 @@
 - Email: Outlook do JD (Microsoft 365, outlook_send_mail). Estes emails automáticos saem mesmo, não ficam em rascunho. Estilo seco, por tópicos, assina "Até já, jd".
 
 ## O que fazer
-Lista a coleção `apresentacoes`. Trata, por esta ordem, os documentos em `pedido`, `gerar_draft` e `publicar`. Se não houver nenhum, termina sem fazer mais nada. Antes de tratar um documento, reserva-o (ver Regras: if_version).
+Lista a coleção `apresentacoes`. Trata, por esta ordem, os documentos em `pedido`, `gerar_draft` e `publicar` (ignora os que têm `apagado` = true). Se não houver nenhum, termina sem fazer mais nada. Antes de tratar um documento, reserva-o (ver Regras: if_version).
 
 ### estado = "pedido" (criar a ficha)
 0. Reserva: update com if_version a pôr `a_criar_em` = agora (o estado fica "pedido"). Se falhar por version_mismatch, ou se `a_criar_em` já existir com menos de 15 minutos, salta o documento.
@@ -32,7 +32,7 @@ Lista a coleção `apresentacoes`. Trata, por esta ordem, os documentos em `pedi
 5. `gerar.py construir <xlsx> --media <Media> --saida "$HOME/mnt/Studio YNG/_Sistema/_publicar/draft-<id>" --desenhos <_desenhos> --modo draft`. Guarda a `assinatura` que o resultado devolve.
 6. Verifica no contentor (Playwright) a 1366 px e 375 px, PT e EN, com a senha draft. Corrige o que estiver partido e repete 5.
 7. Copia a pasta gerada para o contentor (device_stage_files, até 50 ficheiros por chamada), põe-na em `<clone>/drafts/<id>-<chave>/` substituindo a anterior, commit e push para main.
-8. Atualiza o documento: estado "draft", ficha_assinatura (se ficha_v), seccoes (lista das secções ativas, `[{n, menu, bloco}]`, a partir de `gerar.py briefing`), draft_link, draft_em, draft_assinatura = assinatura, draft_chave, mensagem com avisos, atualizado_em. No Excel (`gerar.py estado`): Estado = Draft, Link draft, Draft gerado em.
+8. Atualiza o documento: estado "draft", ficha_assinatura (se ficha_v), seccoes (lista das secções ativas, `[{n, menu, bloco}]`, a partir de `gerar.py briefing`), draft_link, draft_em, senha_draft (do Excel, campo "Senha draft"), draft_assinatura = assinatura, draft_chave, mensagem com avisos, atualizado_em. No Excel (`gerar.py estado`): Estado = Draft, Link draft, Draft gerado em.
 9. Email a pedido_por: link do draft, comentários aplicados neste draft (se houve), senha draft (lida do Excel, campo "Senha draft"), avisos, e que é só para a equipa; quando aprovado, carregar em "Publicar".
 
 ### estado = "publicar"
